@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 type Customer = {
   id: number;
+  docId: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -116,7 +117,7 @@ export const columns: ColumnDef<Customer>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const rowdata = row.original;
 
       return (
         <DropdownMenu>
@@ -130,13 +131,13 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(payment.phone_number)
+                navigator.clipboard.writeText(rowdata.phone_number)
               }
             >
               Copy Phone Number
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.email)}
+              onClick={() => navigator.clipboard.writeText(rowdata.email)}
             >
               Copy Email
             </DropdownMenuItem>
@@ -144,7 +145,10 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">
               Edit Details
             </DropdownMenuItem>
-            <DropdownMenuItem className="bg-red-400 text-white mt-2">
+            <DropdownMenuItem
+              className="bg-red-400 text-white mt-2"
+              onClick={() => console.log(rowdata.docId)}
+            >
               Delete Customer
             </DropdownMenuItem>
           </DropdownMenuContent>

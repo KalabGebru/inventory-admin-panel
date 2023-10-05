@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 type Product = {
   image: string;
   id: number;
+  docId: string;
   details: string;
   unit_price: string;
   product_name: string;
@@ -106,7 +107,7 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const rowdata = row.original;
 
       return (
         <DropdownMenu>
@@ -120,13 +121,13 @@ export const columns: ColumnDef<Product>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(payment.product_name)
+                navigator.clipboard.writeText(rowdata.product_name)
               }
             >
               Copy Product Name
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.unit_price)}
+              onClick={() => navigator.clipboard.writeText(rowdata.unit_price)}
             >
               Copy Product Price
             </DropdownMenuItem>
@@ -134,7 +135,10 @@ export const columns: ColumnDef<Product>[] = [
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">
               Edit Details
             </DropdownMenuItem>
-            <DropdownMenuItem className="bg-red-400 text-white mt-2">
+            <DropdownMenuItem
+              className="bg-red-400 text-white mt-2"
+              onClick={() => console.log(rowdata.docId)}
+            >
               Delete Customer
             </DropdownMenuItem>
           </DropdownMenuContent>

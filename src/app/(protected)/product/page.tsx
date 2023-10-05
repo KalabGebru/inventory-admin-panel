@@ -14,11 +14,16 @@ import services from "@/services/connect";
 type Product = {
   image: string;
   id: number;
+  docId: string;
   details: string;
   unit_price: string;
   product_name: string;
 };
 export default async function Home() {
+  // products.forEach((C) => {
+  //   services.AddProduct(C);
+  // });
+
   const productData = (await services.GetAllProducts()) as Product[];
 
   if (!productData) {
@@ -93,6 +98,7 @@ export default async function Home() {
         <ProductDataTable
           columns={columns}
           data={productData ? productData : []}
+          // data={products}
         />
       </div>
     </main>

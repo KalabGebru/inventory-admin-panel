@@ -13,6 +13,7 @@ import { columns } from "./columns";
 
 type Customer = {
   id: number;
+  docId: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -22,6 +23,10 @@ type Customer = {
 };
 
 export default async function Home() {
+  // people.forEach((C) => {
+  //   services.AddCustomer(C);
+  // });
+
   const custemersData = (await services.GetAllCustomers()) as Customer[];
 
   if (!custemersData) {
@@ -96,6 +101,7 @@ export default async function Home() {
         <CustomerDataTable
           columns={columns}
           data={custemersData ? custemersData : []}
+          // data={people}
         />
       </div>
     </main>

@@ -28,8 +28,16 @@ const services = {
     const customersref = collection(db, "Customers");
 
     try {
-      const id = await addDoc(customersref, { ...customer });
-      return id;
+      const custemerid = await addDoc(customersref, { ...customer });
+      const createdref = doc(db, "Customers", custemerid.id);
+      await setDoc(
+        createdref,
+        {
+          docId: custemerid.id,
+        },
+        { merge: true }
+      );
+      return custemerid;
     } catch (err) {
       console.log(err);
       return "something went wrong";
@@ -39,8 +47,16 @@ const services = {
     const productsref = collection(db, "Products");
 
     try {
-      const id = await addDoc(productsref, { ...product });
-      return id;
+      const productid = await addDoc(productsref, { ...product });
+      const createdref = doc(db, "Products", productid.id);
+      await setDoc(
+        createdref,
+        {
+          docId: productid.id,
+        },
+        { merge: true }
+      );
+      return productid;
     } catch (err) {
       console.log(err);
       return "something went wrong";
@@ -66,6 +82,25 @@ const services = {
       return undefined;
     }
   },
+  DeleteCustomer: async (userId) => {
+    const customerref = doc(db, "Customers", userId);
+    try {
+      await deleteDoc(customerref);
+      return true;
+    } catch (err) {
+      return "something went wrong";
+    }
+  },
+  DeleteProduct: async (userId) => {
+    const productref = doc(db, "Customers", userId);
+    try {
+      await deleteDoc(productref);
+      return true;
+    } catch (err) {
+      return "something went wrong";
+    }
+  },
+
   getUserById: async (id) => {
     const usersref = doc(db, "Users", id);
 
@@ -273,34 +308,6 @@ const services = {
       return true;
     } catch (err) {
       return undefined;
-    }
-  },
-  deleteQuiz: async (userId, quizId, deleteq, newAnswers, newQuiz) => {
-    const usersref = doc(db, "Users", userId);
-    try {
-      await setDoc(
-        usersref,
-        {
-          answers: newAnswers,
-          quizs: newQuiz,
-        },
-        { merge: true }
-      );
-
-      const quizref = doc(db, "Quiz", quizId);
-      if (deleteq == 1) {
-        await deleteDoc(quizref);
-      } else {
-        await setDoc(
-          quizref,
-          {
-            noOfUsers: Number(deleteq) - 1,
-          },
-          { merge: true }
-        );
-      }
-    } catch (err) {
-      return "something went wrong";
     }
   },
 };
