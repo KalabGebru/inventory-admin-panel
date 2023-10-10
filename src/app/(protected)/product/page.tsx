@@ -10,10 +10,13 @@ import {
 import { columns } from "./columns";
 import { ProductDataTable } from "./data-table";
 import services from "@/services/connect";
+import { Button } from "@/components/ui/button";
 
 type Product = {
   image: string;
-  id: number;
+  id: string;
+  catagory: string;
+  datetime: string;
   docId: string;
   details: string;
   unit_price: string;
@@ -24,11 +27,20 @@ export default async function Home() {
   //   services.AddProduct(C);
   // });
 
+  // await services.EditAllProducts();
+
+  const catagoryData = await services.GetAllCatagory();
   const productData = (await services.GetAllProducts()) as Product[];
 
   if (!productData) {
     return <div className="">can not get any data found</div>;
   }
+
+  // const cat = ["beer", "wine", "wiski", "tekila", "gine"];
+
+  // cat.forEach((p) => {
+  //   services.EditAllInventory(p);
+  // });
 
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
@@ -94,10 +106,12 @@ export default async function Home() {
         </CardFooter> */}
         </Card>
       </div>
+
       <div className="">
         <ProductDataTable
           columns={columns}
           data={productData ? productData : []}
+          catagory={catagoryData ? catagoryData : []}
           // data={products}
         />
       </div>

@@ -13,17 +13,34 @@ import {
 import { FiMoreVertical } from "react-icons/fi";
 import { RiArrowUpDownFill } from "react-icons/Ri";
 import { Checkbox } from "@/components/ui/checkbox";
+// import { Customer } from "@/lib/customers";
 
+type credit = { amount: number; used: number };
 type Customer = {
-  id: number;
   docId: string;
   first_name: string;
   last_name: string;
+  credit: credit;
   email: string;
   gender: string;
   phone_number: string;
   discount: number;
+  history: string[];
 };
+
+async function deleteCustomer(id: string) {
+  console.log(id);
+  const res = await fetch("/api/deleteCustomer", {
+    method: "POST",
+    body: JSON.stringify({ id }),
+  });
+
+  if (res.ok) {
+    const response = await res.json();
+    console.log(response.result);
+    window.location.reload();
+  }
+}
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -50,23 +67,6 @@ export const columns: ColumnDef<Customer>[] = [
     },
     enableSorting: false,
     enableHiding: false,
-  },
-  {
-    header: ({ column }) => {
-      return (
-        <Button
-          variant={"ghost"}
-          onClick={() => {
-            column.toggleSorting(column.getIsSorted() === "asc");
-          }}
-          className="pl-0"
-        >
-          Customer ID
-          <RiArrowUpDownFill size={16} />
-        </Button>
-      );
-    },
-    accessorKey: "id",
   },
   {
     header: ({ column }) => {
@@ -106,11 +106,34 @@ export const columns: ColumnDef<Customer>[] = [
     },
   },
   {
-    header: "Discount %",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={"ghost"}
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === "asc");
+          }}
+          className="pl-0"
+        >
+          Discount %
+          <RiArrowUpDownFill size={16} />
+        </Button>
+      );
+    },
     accessorKey: "discount",
     cell: ({ row }) => {
       const formatedDiscountPercentail = `${row.getValue("discount")}%`;
       return <div className="font-medium">{formatedDiscountPercentail}</div>;
+    },
+  },
+  {
+    header: "Credit",
+    accessorKey: "credit",
+    cell: ({ row }) => {
+      const credit: credit = row.getValue("credit");
+      return (
+        <div className="font-medium">{`${credit.amount} - ${credit.used}`}</div>
+      );
     },
   },
   {
@@ -147,7 +170,7 @@ export const columns: ColumnDef<Customer>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"
-              onClick={() => console.log(rowdata.docId)}
+              // onClick={() => deleteCustomer(rowdata.docId)}
             >
               Delete Customer
             </DropdownMenuItem>

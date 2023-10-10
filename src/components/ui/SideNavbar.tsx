@@ -2,8 +2,10 @@
 import React from "react";
 import { useState } from "react";
 import { FaHome } from "react-icons/fa";
-import { BiUserPin } from "react-icons/bi";
+import { FaUsers } from "react-icons/fa";
 import { LiaProductHunt } from "react-icons/lia";
+import { MdInventory } from "react-icons/Md";
+import { LuClipboardList } from "react-icons/Lu";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -14,14 +16,24 @@ const NavMenu = [
     icon: <FaHome className="w-6 h-6 " />,
   },
   {
-    href: "/customer",
-    text: "Customer",
-    icon: <BiUserPin className="w-6 h-6" />,
-  },
-  {
     href: "/product",
     text: "Product",
     icon: <LiaProductHunt className="w-6 h-6" />,
+  },
+  {
+    href: "/customer",
+    text: "Customer",
+    icon: <FaUsers className="w-6 h-6" />,
+  },
+  {
+    href: "/inventory",
+    text: "Inventory",
+    icon: <MdInventory className="w-6 h-6" />,
+  },
+  {
+    href: "/sales",
+    text: "Sales",
+    icon: <LuClipboardList className="w-6 h-6" />,
   },
 ];
 

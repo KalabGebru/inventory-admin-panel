@@ -16,20 +16,50 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Product } from "@/lib/products";
 
+type Customer = {
+  docId: string;
+  first_name: string;
+  last_name: string;
+  credit: { amount: number; used: number };
+  email: string;
+  gender: string;
+  phone_number: string;
+  discount: number;
+  history: string[];
+};
+
 type Product = {
   image: string;
   id: string;
-  catagory: string;
   datetime: string;
+  catagory: string;
   docId: string;
   details: string;
   unit_price: string;
   product_name: string;
 };
 
+type Items = {
+  no: number;
+  productId: string;
+};
+
+type SalesViewData = {
+  products: Product[];
+  customerName: Customer;
+  customer: string;
+  productId: string;
+  datetime: string;
+  docId: string;
+  discounted: string;
+  totalAmount: number;
+  paidIn: string;
+  items: Items[];
+};
+
 async function deleteProduct(id: string) {
   console.log(id);
-  const res = await fetch("/api/deleteProduct", {
+  const res = await fetch("/api/deleteSales", {
     method: "POST",
     body: JSON.stringify({ id }),
   });
@@ -41,7 +71,7 @@ async function deleteProduct(id: string) {
   }
 }
 
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<SalesViewData>[] = [
   {
     id: "select",
     header: ({ table }) => {
@@ -68,56 +98,40 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: false,
   },
   {
-    header: "Image",
-    accessorKey: "image",
+    header: "Products",
+    accessorKey: "products",
     cell: ({ row }) => {
-      const imgUrl = row.getValue("image");
+      const Allproducts: Product[] = row.getValue("products");
+      console.log(Allproducts);
+      const Allnames = Allproducts.map((g) => g.product_name);
 
-      return (
-        <Avatar>
-          <AvatarImage src={imgUrl as string} />
-          <AvatarFallback>PI</AvatarFallback>
-        </Avatar>
-      );
+      return <div className="">{Allnames.join(" , ")}</div>;
     },
   },
   {
-    header: ({ column }) => {
-      return (
-        <Button
-          variant={"ghost"}
-          onClick={() => {
-            column.toggleSorting(column.getIsSorted() === "asc");
-          }}
-          className="pl-0"
-        >
-          Product Name
-          <RiArrowUpDownFill size={16} />
-        </Button>
-      );
+    header: "Customer Name",
+    accessorKey: "customerName",
+    cell: ({ row }) => {
+      const customer: Customer = row.getValue("customerName");
+      return <div className="">{customer.first_name}</div>;
     },
-    accessorKey: "product_name",
   },
   {
-    header: "Catagory",
-    accessorKey: "catagory",
+    header: "PaidIn",
+    accessorKey: "paidIn",
     enableColumnFilter: true,
     filterFn: (row, columnId, filterStatuses) => {
       if (filterStatuses.length === 0) return true;
-      const catagory: any = row.getValue(columnId);
+      const paidIn: any = row.getValue(columnId);
       // value => two date input values
       console.log(filterStatuses);
-      console.log(catagory);
+      console.log(paidIn);
       //If one filter defined and date is null filter it
-      if (filterStatuses.includes(catagory)) return true;
+      if (filterStatuses.includes(paidIn)) return true;
       else return false;
     },
   },
   {
-    header: "Unit Price",
-    accessorKey: "unit_price",
-  },
-  {
     header: ({ column }) => {
       return (
         <Button
@@ -127,12 +141,16 @@ export const columns: ColumnDef<Product>[] = [
           }}
           className="pl-0"
         >
-          Product ID
+          Total Amount
           <RiArrowUpDownFill size={16} />
         </Button>
       );
     },
-    accessorKey: "id",
+    accessorKey: "totalAmount",
+  },
+  {
+    header: "Discount",
+    accessorKey: "discounted",
   },
   {
     header: ({ column }) => {
@@ -192,15 +210,17 @@ export const columns: ColumnDef<Product>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(rowdata.product_name)
+                navigator.clipboard.writeText(rowdata.customerName.last_name)
               }
             >
-              Copy Product Name
+              Copy Customer Name
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(rowdata.unit_price)}
+              onClick={() =>
+                navigator.clipboard.writeText(rowdata.totalAmount.toString())
+              }
             >
-              Copy Product Price
+              Copy Total Price
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">

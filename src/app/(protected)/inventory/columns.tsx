@@ -16,20 +16,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Product } from "@/lib/products";
 
-type Product = {
-  image: string;
-  id: string;
+type InventoryViewData = {
+  product_name: string;
   catagory: string;
+  image: string;
+  productId: string;
   datetime: string;
   docId: string;
-  details: string;
-  unit_price: string;
-  product_name: string;
+  currentAmount: number;
+  history: [
+    {
+      currentAmount: string;
+      datetime: string;
+    }
+  ];
 };
 
-async function deleteProduct(id: string) {
+async function deleteInventory(id: string) {
   console.log(id);
-  const res = await fetch("/api/deleteProduct", {
+  const res = await fetch("/api/deleteInventory", {
     method: "POST",
     body: JSON.stringify({ id }),
   });
@@ -41,7 +46,7 @@ async function deleteProduct(id: string) {
   }
 }
 
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<InventoryViewData>[] = [
   {
     id: "select",
     header: ({ table }) => {
@@ -98,6 +103,7 @@ export const columns: ColumnDef<Product>[] = [
     },
     accessorKey: "product_name",
   },
+
   {
     header: "Catagory",
     accessorKey: "catagory",
@@ -114,10 +120,6 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    header: "Unit Price",
-    accessorKey: "unit_price",
-  },
-  {
     header: ({ column }) => {
       return (
         <Button
@@ -127,12 +129,12 @@ export const columns: ColumnDef<Product>[] = [
           }}
           className="pl-0"
         >
-          Product ID
+          Current Amount
           <RiArrowUpDownFill size={16} />
         </Button>
       );
     },
-    accessorKey: "id",
+    accessorKey: "currentAmount",
   },
   {
     header: ({ column }) => {
@@ -144,7 +146,7 @@ export const columns: ColumnDef<Product>[] = [
           }}
           className="pl-0"
         >
-          Added Date
+          last Added Date
           <RiArrowUpDownFill size={16} />
         </Button>
       );
@@ -198,7 +200,9 @@ export const columns: ColumnDef<Product>[] = [
               Copy Product Name
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(rowdata.unit_price)}
+              onClick={() =>
+                navigator.clipboard.writeText(rowdata.currentAmount.toString())
+              }
             >
               Copy Product Price
             </DropdownMenuItem>
@@ -208,7 +212,7 @@ export const columns: ColumnDef<Product>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"
-              onClick={() => deleteProduct(rowdata.docId)}
+              onClick={() => deleteInventory(rowdata.docId)}
             >
               Delete Product
             </DropdownMenuItem>

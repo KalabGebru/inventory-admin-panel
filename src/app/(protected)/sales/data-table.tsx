@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -27,25 +27,35 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { FiFilter } from "react-icons/fi";
+import { BsFilterRight } from "react-icons/bs";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function CustomerDataTable<TData, TValue>({
+export function ProductDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "datetime", desc: false },
+  ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  //   console.log(rowSelection);
+  const [minDate, setMinDate] = useState();
+  const [maxDate, setMaxDate] = useState();
+
+  const [paidFilter, setPaidFilter] = useState<string[]>([]);
+
+  console.log(columnFilters);
 
   const table = useReactTable({
     data,
@@ -68,32 +78,145 @@ export function CustomerDataTable<TData, TValue>({
     },
   });
 
+  function minDateFun(e: any) {
+    setMinDate(e.target.value);
+  }
+
+  function maxDateFun(e: any) {
+    setMaxDate(e.target.value);
+  }
+
+  useEffect(() => {
+    setColumnFilters((pre) => [
+      ...pre,
+      {
+        id: "datetime",
+        value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
+      },
+    ]);
+  }, [minDate, maxDate]);
+
+  useEffect(() => {
+    setColumnFilters((pre) => [
+      ...pre,
+      {
+        id: "paidIn",
+        value: paidFilter,
+      },
+    ]);
+  }, [paidFilter]);
+
+  function clearFilterDate() {
+    setMaxDate(undefined);
+    setMinDate(undefined);
+  }
+
   return (
     <div className="">
       {/* input */}
       <div className="flex items-center justify-between my-4">
-        <div className="">
+        <div className="flex items-center gap-8">
           <Input
             placeholder="Filter First name"
             value={
-              (table.getColumn("first_name")?.getFilterValue() as string) || ""
+              (table.getColumn("product_name")?.getFilterValue() as string) ||
+              ""
             }
             onChange={(e) => {
-              table.getColumn("first_name")?.setFilterValue(e.target.value);
+              table.getColumn("product_name")?.setFilterValue(e.target.value);
             }}
             className="w-full md:min-w-[400px]"
           />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                <FiFilter size={16} />
+                <div className="pl-2">Catagory</div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {["cash", "credit", "mixed"].map((p, i) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={i}
+                    className="capitalize"
+                    checked={paidFilter.includes(p)}
+                    onCheckedChange={(value) => {
+                      const arr = paidFilter;
+                      if (value) {
+                        //checking weather array contain the id
+                        arr.push(p); //adding to array because value doesnt exists
+                      } else {
+                        arr.splice(arr.indexOf(p), 1); //deleting
+                      }
+                      console.log(arr);
+                      setPaidFilter([...arr]);
+                      console.log(paidFilter);
+                    }}
+                  >
+                    {p}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="flex min-w-fit gap-8">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  <FiFilter size={16} />
+                  <div className="pl-2">Date Filter</div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel className="text-lg">Date</DropdownMenuLabel>
+                <div className="flex flex-col items-end gap-4 p-4">
+                  <div className="flex items-center gap-2">
+                    <span> From:</span>
+                    <Input
+                      type={"date"}
+                      value={minDate}
+                      onChange={(e) => minDateFun(e)}
+                      className="w-full md:min-w-[200px]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>To:</span>
+                    <Input
+                      type={"date"}
+                      value={maxDate}
+                      onChange={(e) => maxDateFun(e)}
+                      className="w-full md:min-w-[200px]"
+                    />
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {(minDate || maxDate) && (
+              <div className="flex gap-4 items-center">
+                <span>
+                  {minDate ? `${minDate} to ` : "Before to "}
+                  {maxDate ? maxDate : "Current"}
+                </span>
+                <Button variant="secondary" onClick={clearFilterDate}>
+                  Clear Date Filter
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
+
         <div className="flex items-center gap-8">
           <div className="">
             <Button asChild>
-              <Link href="/customer/addCustomer">Add Customer</Link>
+              <Link href="/product/addProduct">Add Product</Link>
             </Button>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
-                Columns
+                <BsFilterRight size={16} />
+                <div className="pl-2">View</div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -146,8 +269,13 @@ export function CustomerDataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"} //not nessesary
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell, i) => (
+                    <TableCell
+                      key={cell.id}
+                      // className={`${
+                      //   i == 0 || i == 1 || i == 7 ? "w-[100px]" : ""
+                      // }`}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -207,4 +335,4 @@ export function CustomerDataTable<TData, TValue>({
   );
 }
 
-export default CustomerDataTable;
+export default ProductDataTable;

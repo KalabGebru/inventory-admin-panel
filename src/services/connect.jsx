@@ -8,7 +8,13 @@ import {
   deleteDoc,
   setDoc,
 } from "firebase/firestore";
-import { db } from "../firebase.config";
+import {
+  ref,
+  getDownloadURL,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { db, storage } from "../firebase.config";
 
 //   import toast from "react-hot-toast";
 
@@ -82,22 +88,136 @@ const services = {
       return undefined;
     }
   },
-  DeleteCustomer: async (userId) => {
-    const customerref = doc(db, "Customers", userId);
+  GetAllInventorys: async () => {
+    const inventorysref = collection(db, "Inventory");
+    try {
+      const data = await getDocs(inventorysref);
+      const allinventorys = data.docs.map((doc) => doc.data());
+      return allinventorys;
+    } catch (err) {
+      return undefined;
+    }
+  },
+  GetAllCatagory: async () => {
+    const catagorysref = collection(db, "Catagorys");
+    try {
+      const data = await getDocs(catagorysref);
+      const allcatagorys = data.docs.map((doc) => doc.data());
+      return allcatagorys;
+    } catch (err) {
+      return undefined;
+    }
+  },
+  GetAllSeles: async () => {
+    const salesref = collection(db, "Sales");
+    try {
+      const data = await getDocs(salesref);
+      const allsales = data.docs.map((doc) => doc.data());
+      return allsales;
+    } catch (err) {
+      return undefined;
+    }
+  },
+  DeleteCustomer: async (Id) => {
+    const customerref = doc(db, "Customers", Id);
     try {
       await deleteDoc(customerref);
       return true;
     } catch (err) {
+      console.log(err);
       return "something went wrong";
     }
   },
-  DeleteProduct: async (userId) => {
-    const productref = doc(db, "Customers", userId);
+  UploadImage: async (file) => {
+    console.log(file);
+    const name = file.name;
+    const storageRef = ref(storage, `image/${name}`);
+    console.log(storage);
     try {
-      await deleteDoc(productref);
-      return true;
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      let url;
+      console.log(uploadTask);
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          // const progress =
+          //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log("Upload is " + progress + "% done");
+          // switch (snapshot.state) {
+          //   case "paused":
+          //     console.log("Upload is paused");
+          //     break;
+          //   case "running":
+          //     console.log("Upload is running");
+          //     break;
+          // }
+        },
+        (err) => {
+          console.log(err);
+          // Handle unsuccessful uploads
+        },
+        () => {
+          console.log("uploaded?");
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log(downloadURL);
+            url = downloadURL;
+            console.log("File available at", downloadURL);
+          });
+        }
+      );
+      return url;
     } catch (err) {
+      console.log(err);
       return "something went wrong";
+    }
+  },
+  EditAllInventory: async (name) => {
+    const productssref = collection(db, "Sales");
+    try {
+      const data = await addDoc(productssref, {
+        items: [
+          { productId: "0Nn0flH1jjwyilHV2CUQ", no: 3 },
+          { productId: "504c4l9P0upwJvRhlHcR", no: 1 },
+        ],
+        totalAmount: 5000,
+        customer: "03P3aB5TJtqzDJrsY1Cl",
+        paidIn: "cash",
+        discounted: true,
+        datetime: new Date().toISOString(),
+      });
+      // const allproducts = data.docs.map((doc) => doc.data());
+      // allproducts.map((P) => {
+      //   const productssref = doc(db, "Customers", P.docId);
+      //   setDoc(
+      //     productssref,
+      //     {
+      //       credit: { amount: 5000, used: 3000 },
+      //       history: [],
+      //     },
+      //     { merge: true }
+      //   );
+      // });
+      const createdref = doc(db, "Sales", data.id);
+      await setDoc(
+        createdref,
+        {
+          docId: data.id,
+        },
+        { merge: true }
+      );
+      console.log(data.id);
+      return data.id;
+    } catch (err) {
+      console.log(err);
+      return undefined;
     }
   },
 
@@ -313,3 +433,5 @@ const services = {
 };
 
 export default services;
+
+const cat = ["beer", "wine", "wiski", "tekila", "gine"];
