@@ -14,6 +14,7 @@ import InventoryDataTable from "./data-table";
 type Product = {
   image: string;
   id: string;
+  invId: string;
   datetime: string;
   catagory: string;
   docId: string;
@@ -27,7 +28,7 @@ type Inventory = {
   datetime: string;
   docId: string;
   currentAmount: number;
-  history: [{ currentAmount: string; datetime: string }];
+  history: [{ addedAmount: number; datetime: string }];
 };
 
 export default async function Home() {

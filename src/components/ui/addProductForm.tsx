@@ -25,7 +25,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "./textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -37,6 +37,7 @@ const FormSchema = z.object({
     .max(30, {
       message: "Product Name must be at max 30 characters.",
     }),
+  catagory: z.string(),
   unit_price: z.string(),
   details: z
     .string()
@@ -49,13 +50,60 @@ const FormSchema = z.object({
   image: z.string().url(),
 });
 
-export default function AddProductForm() {
+type cat = {
+  datetime: string;
+  catagoryName: string;
+  docId: string;
+};
+type Product = {
+  image: string;
+  id: string;
+  invId: string;
+  catagory: string;
+  datetime: string;
+  docId: string;
+  details: string;
+  unit_price: string;
+  product_name: string;
+};
+
+type Props = {
+  defaultValue?: Product;
+  editMode?: boolean;
+  docId?: string;
+};
+
+export default function AddProductForm({
+  defaultValue,
+  editMode,
+  docId,
+}: Props) {
   const [file, setfile] = useState<File>();
+  const [catagorys, setCatagorys] = useState([]);
+
   const router = useRouter();
   const formData = new FormData();
 
+  useEffect(() => {
+    const res = fetch("/api/getCatagorys")
+      .then((response) => response.json())
+      .then((data) => {
+        setCatagorys(data.result);
+      });
+  }, []);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      id: defaultValue?.id,
+      product_name: defaultValue?.product_name,
+      catagory: defaultValue?.catagory,
+      unit_price: Number(
+        defaultValue?.unit_price.replace(/[^0-9.-]+/g, "")
+      ).toString(),
+      details: defaultValue?.details,
+      image: defaultValue?.image,
+    },
   });
 
   function objectToFormData(obj: object) {
@@ -72,19 +120,34 @@ export default function AddProductForm() {
       formData.append("file", file);
     }
 
-    const res = await fetch("/api/addProduct", {
-      method: "POST",
-      body: formData,
-    });
+    let res;
+    if (editMode && docId) {
+      formData.append("docId", docId);
+      res = await fetch("/api/editProduct", {
+        method: "POST",
+        body: formData,
+      });
+    } else {
+      res = await fetch("/api/addProduct", {
+        method: "POST",
+        body: formData,
+      });
+    }
+
     console.log(formData);
 
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      router.push(`/product/`);
+      if (response.alreadyExist) {
+        alert(`a product with ${data.id} already exists`);
+      } else {
+        router.push(`/product/`);
+      }
     }
   }
 
+  if (!catagorys) return null;
   return (
     <div className="p-8 border rounded-md">
       <div className="text-xl mb-8">Add a Product</div>
@@ -123,12 +186,40 @@ export default function AddProductForm() {
           />
           <FormField
             control={form.control}
+            name="catagory"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Catagory</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Catagory" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {catagorys.map((cat: cat) => (
+                        <SelectItem value={cat.catagoryName}>
+                          {cat.catagoryName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {/* <FormDescription>Input your user password.</FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="unit_price"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Unit Price</FormLabel>
                 <FormControl>
-                  <Input placeholder="Unit Price" {...field} />
+                  <Input type="number" placeholder="Unit Price" {...field} />
                 </FormControl>
                 {/* <FormDescription>Input your user password.</FormDescription> */}
                 <FormMessage />

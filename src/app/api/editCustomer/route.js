@@ -9,6 +9,7 @@ export const POST = async (request) => {
     phone_number,
     discount,
     creditAmount,
+    docId,
     creditUsed,
   } = await request.json();
 
@@ -28,7 +29,7 @@ export const POST = async (request) => {
       history: [],
     };
     console.log(newCustomer);
-    const newCustomerId = await services.AddCustomer(newCustomer);
+    const newCustomerId = await services.EditCustomer(newCustomer, docId);
 
     return new Response(JSON.stringify({ result: newCustomerId }), {
       status: 200,

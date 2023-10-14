@@ -14,11 +14,13 @@ import { FiMoreVertical } from "react-icons/fi";
 import { RiArrowUpDownFill } from "react-icons/Ri";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 // import { Product } from "@/lib/products";
 
 type Product = {
   image: string;
   id: string;
+  invId: string;
   catagory: string;
   datetime: string;
   docId: string;
@@ -37,7 +39,7 @@ async function deleteProduct(id: string) {
   if (res.ok) {
     const response = await res.json();
     console.log(response.result);
-    window.location.reload();
+    if (response.result) window.location.reload();
   }
 }
 
@@ -204,7 +206,9 @@ export const columns: ColumnDef<Product>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">
-              Edit Details
+              <Link href={`product/editProduct/${rowdata.docId}`}>
+                Edit Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"

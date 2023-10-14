@@ -125,7 +125,7 @@ export function InventoryDataTable<TData, TValue>({
       <div className="flex items-center justify-between my-4">
         <div className="flex items-center gap-8">
           <Input
-            placeholder="Filter First name"
+            placeholder="Filter Product Name"
             value={
               (table.getColumn("product_name")?.getFilterValue() as string) ||
               ""

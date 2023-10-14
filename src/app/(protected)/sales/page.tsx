@@ -43,6 +43,7 @@ type Customer = {
 type Product = {
   image: string;
   id: string;
+  invId: string;
   datetime: string;
   catagory: string;
   docId: string;
@@ -69,8 +70,8 @@ export default async function Home() {
     const customerD = customersData.filter((c) => c.docId === s.customer)[0];
 
     const detailsP = {
-      products: productD,
-      customerName: customerD,
+      productsD: productD,
+      customerD: customerD,
     };
 
     return {

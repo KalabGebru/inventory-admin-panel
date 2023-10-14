@@ -31,6 +31,7 @@ type Customer = {
 type Product = {
   image: string;
   id: string;
+  invId: string;
   datetime: string;
   catagory: string;
   docId: string;
@@ -45,8 +46,8 @@ type Items = {
 };
 
 type SalesViewData = {
-  products: Product[];
-  customerName: Customer;
+  productsD: Product[];
+  customerD: Customer;
   customer: string;
   productId: string;
   datetime: string;
@@ -57,7 +58,7 @@ type SalesViewData = {
   items: Items[];
 };
 
-async function deleteProduct(id: string) {
+async function deleteSales(id: string) {
   console.log(id);
   const res = await fetch("/api/deleteSales", {
     method: "POST",
@@ -99,9 +100,9 @@ export const columns: ColumnDef<SalesViewData>[] = [
   },
   {
     header: "Products",
-    accessorKey: "products",
+    accessorKey: "productsD",
     cell: ({ row }) => {
-      const Allproducts: Product[] = row.getValue("products");
+      const Allproducts: Product[] = row.getValue("productsD");
       console.log(Allproducts);
       const Allnames = Allproducts.map((g) => g.product_name);
 
@@ -109,11 +110,42 @@ export const columns: ColumnDef<SalesViewData>[] = [
     },
   },
   {
-    header: "Customer Name",
-    accessorKey: "customerName",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant={"ghost"}
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === "asc");
+          }}
+          className="pl-0"
+        >
+          Customer Name
+          <RiArrowUpDownFill size={16} />
+        </Button>
+      );
+    },
+    accessorKey: "customerD",
     cell: ({ row }) => {
-      const customer: Customer = row.getValue("customerName");
+      const customer: Customer = row.getValue("customerD");
       return <div className="">{customer.first_name}</div>;
+    },
+    filterFn: (row, columnId, filterStatuses) => {
+      if (!filterStatuses) return true;
+      const customer: Customer = row.getValue(columnId);
+      // value => two date input values
+      //If one filter defined and date is null filter it
+      let allCharactersExist = true;
+      let name = customer.first_name.toLowerCase();
+      for (let i = 0; i < filterStatuses.length; i++) {
+        const caracter = filterStatuses[i].toLowerCase();
+        if (!name.includes(caracter)) {
+          allCharactersExist = false;
+          break;
+        } else {
+          name = name.replace(caracter, "");
+        }
+      }
+      return allCharactersExist;
     },
   },
   {
@@ -210,7 +242,7 @@ export const columns: ColumnDef<SalesViewData>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(rowdata.customerName.last_name)
+                navigator.clipboard.writeText(rowdata.customerD.first_name)
               }
             >
               Copy Customer Name
@@ -228,9 +260,9 @@ export const columns: ColumnDef<SalesViewData>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"
-              onClick={() => deleteProduct(rowdata.docId)}
+              onClick={() => deleteSales(rowdata.docId)}
             >
-              Delete Product
+              Delete Sales
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

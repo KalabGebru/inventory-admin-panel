@@ -13,6 +13,7 @@ import {
 import { FiMoreVertical } from "react-icons/fi";
 import { RiArrowUpDownFill } from "react-icons/Ri";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 // import { Customer } from "@/lib/customers";
 
 type credit = { amount: number; used: number };
@@ -166,11 +167,13 @@ export const columns: ColumnDef<Customer>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">
-              Edit Details
+              <Link href={`customer/editCustomer/${rowdata.docId}`}>
+                Edit Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"
-              // onClick={() => deleteCustomer(rowdata.docId)}
+              onClick={() => deleteCustomer(rowdata.docId)}
             >
               Delete Customer
             </DropdownMenuItem>

@@ -117,13 +117,12 @@ export function ProductDataTable<TData, TValue>({
       <div className="flex items-center justify-between my-4">
         <div className="flex items-center gap-8">
           <Input
-            placeholder="Filter First name"
+            placeholder="Filter Customer name"
             value={
-              (table.getColumn("product_name")?.getFilterValue() as string) ||
-              ""
+              (table.getColumn("customerD")?.getFilterValue() as string) || ""
             }
             onChange={(e) => {
-              table.getColumn("product_name")?.setFilterValue(e.target.value);
+              table.getColumn("customerD")?.setFilterValue(e.target.value);
             }}
             className="w-full md:min-w-[400px]"
           />
@@ -131,7 +130,7 @@ export function ProductDataTable<TData, TValue>({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
                 <FiFilter size={16} />
-                <div className="pl-2">Catagory</div>
+                <div className="pl-2">PainIn</div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -209,7 +208,7 @@ export function ProductDataTable<TData, TValue>({
         <div className="flex items-center gap-8">
           <div className="">
             <Button asChild>
-              <Link href="/product/addProduct">Add Product</Link>
+              <Link href="/sales/addSales">Add Sales</Link>
             </Button>
           </div>
           <DropdownMenu>

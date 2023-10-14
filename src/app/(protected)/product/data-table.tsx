@@ -51,7 +51,7 @@ export function ProductDataTable<TData, TValue>({
   catagory,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "datetime", desc: false },
+    { id: "datetime", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -126,7 +126,7 @@ export function ProductDataTable<TData, TValue>({
       <div className="flex items-center justify-between my-4">
         <div className="flex items-center gap-8">
           <Input
-            placeholder="Filter First name"
+            placeholder="Filter Product Name"
             value={
               (table.getColumn("product_name")?.getFilterValue() as string) ||
               ""

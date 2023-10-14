@@ -42,6 +42,8 @@ const FormSchema = z.object({
     .max(9, {
       message: "Phone number must be at '251' + 9 characters.",
     }),
+  creditAmount: z.string(),
+  creditUsed: z.string(),
   discount: z
     .string()
     .min(0, {
@@ -52,19 +54,64 @@ const FormSchema = z.object({
     }),
 });
 
-export default function AddCustomerForm() {
+type Customer = {
+  docId: string;
+  first_name: string;
+  last_name: string;
+  credit: { amount: number; used: number };
+  email: string;
+  gender: string;
+  phone_number: string;
+  discount: number;
+  history: string[];
+};
+
+type Props = {
+  defaultValue?: Customer;
+  editMode?: boolean;
+  docId?: string;
+};
+
+export default function AddCustomerForm({
+  defaultValue,
+  editMode,
+  docId,
+}: Props) {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      first_name: defaultValue?.first_name,
+      last_name: defaultValue?.last_name,
+      gender: defaultValue?.gender,
+      email: defaultValue?.email,
+      phone_number: defaultValue?.phone_number.toString(),
+      creditAmount: defaultValue?.credit.amount.toString(),
+      creditUsed: defaultValue?.credit.used.toString(),
+      discount: defaultValue?.discount.toString(),
+    },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    const res = await fetch("/api/addCustomer", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+
+    let res;
+    if (editMode && docId) {
+      const newData = {
+        ...data,
+        docId: docId,
+      };
+      res = await fetch("/api/editCustomer", {
+        method: "POST",
+        body: JSON.stringify(newData),
+      });
+    } else {
+      res = await fetch("/api/addCustomer", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    }
 
     if (res.ok) {
       const response = await res.json();
@@ -131,6 +178,35 @@ export default function AddCustomerForm() {
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
                   <Input type="number" placeholder="Phone Number" {...field} />
+                </FormControl>
+                {/* <FormDescription>Input your user password.</FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="creditAmount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Credit Allowed For The Customer</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="5000" {...field} />
+                </FormControl>
+                {/* <FormDescription>Input your user password.</FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="creditUsed"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Credit Used For The Customer</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="5000" {...field} />
                 </FormControl>
                 {/* <FormDescription>Input your user password.</FormDescription> */}
                 <FormMessage />

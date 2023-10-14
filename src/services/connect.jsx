@@ -53,19 +53,154 @@ const services = {
     const productsref = collection(db, "Products");
 
     try {
-      const productid = await addDoc(productsref, { ...product });
-      const createdref = doc(db, "Products", productid.id);
+      const data = await addDoc(productsref, { ...product });
+      const createdref = doc(db, "Products", data.id);
       await setDoc(
         createdref,
         {
-          docId: productid.id,
+          docId: data.id,
         },
         { merge: true }
       );
-      return productid;
+      return data.id;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  AddInventory: async (productId) => {
+    console.log(productId);
+    const inventoryref = collection(db, "Inventory");
+
+    try {
+      const data = await addDoc(inventoryref, {
+        productId: productId,
+        history: [],
+        currentAmount: 0,
+        datetime: new Date().toISOString(),
+      });
+      const created = doc(db, "Inventory", data.id);
+      await setDoc(
+        created,
+        {
+          docId: data.id,
+        },
+        { merge: true }
+      );
+      const product = doc(db, "Products", productId);
+      await setDoc(
+        product,
+        {
+          invId: data.id,
+        },
+        { merge: true }
+      );
+      return data.id;
     } catch (err) {
       console.log(err);
       return "something went wrong";
+    }
+  },
+  AddSales: async (Sales) => {
+    const productsref = collection(db, "Sales");
+
+    try {
+      const data = await addDoc(productsref, { ...Sales });
+      const createdref = doc(db, "Sales", data.id);
+      await setDoc(
+        createdref,
+        {
+          docId: data.id,
+        },
+        { merge: true }
+      );
+      return data.id;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  EditProduct: async (product, productId) => {
+    const createdref = doc(db, "Products", productId);
+    try {
+      await setDoc(
+        createdref,
+        {
+          ...product,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  },
+  EditCustomer: async (customer, customerId) => {
+    const createdref = doc(db, "Customers", customerId);
+    try {
+      await setDoc(
+        createdref,
+        {
+          ...customer,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  },
+  AddToInventory: async (id, addedAmount, currentAmount) => {
+    console.log(id, addedAmount);
+    const productsref = doc(db, "Inventory", id);
+
+    try {
+      await setDoc(
+        productsref,
+        {
+          currentAmount: currentAmount,
+          history: arrayUnion(
+            ...[
+              { addedAmount: addedAmount, datetime: new Date().toISOString() },
+            ]
+          ),
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  EditToInventory: async (id, history, currentAmount) => {
+    const productsref = doc(db, "Inventory", id);
+
+    try {
+      await setDoc(
+        productsref,
+        {
+          currentAmount: currentAmount,
+          history: history,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  GetAllCatagorys: async () => {
+    const catagorysref = collection(db, "Catagorys");
+    try {
+      const data = await getDocs(catagorysref);
+      const allcatagorys = data.docs.map((doc) => doc.data());
+      return allcatagorys;
+    } catch (err) {
+      return undefined;
     }
   },
   GetAllCustomers: async () => {
@@ -128,6 +263,35 @@ const services = {
       return "something went wrong";
     }
   },
+  DeleteProduct: async (Id) => {
+    const productref = doc(db, "Products", Id);
+    try {
+      await deleteDoc(productref);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return "something went wrong";
+    }
+  },
+  DeleteInventory: async (Id, productId) => {
+    const invenntoryref = doc(db, "Inventory", Id);
+    try {
+      await deleteDoc(invenntoryref);
+
+      const productsref = doc(db, "Products", productId);
+      await setDoc(
+        productsref,
+        {
+          invId: "",
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
   UploadImage: async (file) => {
     console.log(file);
     const name = file.name;
@@ -179,59 +343,118 @@ const services = {
       return "something went wrong";
     }
   },
-  EditAllInventory: async (name) => {
-    const productssref = collection(db, "Sales");
+  GetProductById: async (id) => {
+    const productsref = doc(db, "Products", id);
+
     try {
-      const data = await addDoc(productssref, {
-        items: [
-          { productId: "0Nn0flH1jjwyilHV2CUQ", no: 3 },
-          { productId: "504c4l9P0upwJvRhlHcR", no: 1 },
-        ],
-        totalAmount: 5000,
-        customer: "03P3aB5TJtqzDJrsY1Cl",
-        paidIn: "cash",
-        discounted: true,
-        datetime: new Date().toISOString(),
-      });
-      // const allproducts = data.docs.map((doc) => doc.data());
-      // allproducts.map((P) => {
-      //   const productssref = doc(db, "Customers", P.docId);
-      //   setDoc(
-      //     productssref,
-      //     {
-      //       credit: { amount: 5000, used: 3000 },
-      //       history: [],
-      //     },
-      //     { merge: true }
-      //   );
-      // });
-      const createdref = doc(db, "Sales", data.id);
+      const product = await getDoc(productsref);
+
+      return product.data();
+    } catch (err) {
+      return null;
+    }
+  },
+  GetCustomerById: async (id) => {
+    const customersref = doc(db, "Customers", id);
+
+    try {
+      const product = await getDoc(customersref);
+
+      return product.data();
+    } catch (err) {
+      return null;
+    }
+  },
+  GetInventoryById: async (id) => {
+    const invenntoryref = doc(db, "Inventory", id);
+
+    try {
+      const inventory = await getDoc(invenntoryref);
+
+      return inventory.data();
+    } catch (err) {
+      return null;
+    }
+  },
+  SubInventory: async (id, currentAmount) => {
+    const productsref = doc(db, "Inventory", id);
+
+    try {
       await setDoc(
-        createdref,
+        productsref,
         {
-          docId: data.id,
+          currentAmount: currentAmount,
         },
         { merge: true }
       );
-      console.log(data.id);
-      return data.id;
+      return true;
     } catch (err) {
       console.log(err);
       return undefined;
     }
   },
-
-  getUserById: async (id) => {
-    const usersref = doc(db, "Users", id);
+  AddSalesToCustomer: async (customerId, salesId) => {
+    const customersref = doc(db, "Customers", customerId);
 
     try {
-      const user = await getDoc(usersref);
-
-      return user.data();
+      await setDoc(
+        customersref,
+        {
+          history: arrayUnion(
+            ...[{ salesId: salesId, datetime: new Date().toISOString() }]
+          ),
+        },
+        { merge: true }
+      );
+      return true;
     } catch (err) {
+      console.log(err);
       return "something went wrong";
     }
   },
+
+  // EditAllInventory: async () => {
+  //   const productssref = collection(db, "Products");
+  //   try {
+  //     const data = await getDocs(productssref);
+  //     const allproducts = data.docs.map((doc) => doc.data());
+
+  //     const inventoryref = collection(db, "Inventory");
+
+  //     for (let i = 0; i < allproducts.length; i++) {
+  //       const data = await addDoc(inventoryref, {
+  //         productId: allproducts[i].docId,
+  //         history: [
+  //           { addedAmount: 30, datetime: "2023-10-10T08:42:35.263Z" },
+  //           { addedAmount: 20, datetime: "2023-11-10T08:42:35.263Z" },
+  //         ],
+  //         currentAmount: 50,
+  //         datetime: new Date().toISOString(),
+  //       });
+  //       const created = doc(db, "Inventory", data.id);
+  //       await setDoc(
+  //         created,
+  //         {
+  //           docId: data.id,
+  //         },
+  //         { merge: true }
+  //       );
+
+  //       const product = doc(db, "Products", allproducts[i].docId);
+  //       await setDoc(
+  //         product,
+  //         {
+  //           invId: data.id,
+  //         },
+  //         { merge: true }
+  //       );
+  //     }
+  //     return true;
+  //   } catch (err) {
+  //     console.log(err);
+  //     return undefined;
+  //   }
+  // },
   setQuizs: async (userid, param, Details) => {
     const quizref = collection(db, "Quiz");
     try {

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 type Product = {
   image: string;
   id: string;
+  invId: string;
   catagory: string;
   datetime: string;
   docId: string;

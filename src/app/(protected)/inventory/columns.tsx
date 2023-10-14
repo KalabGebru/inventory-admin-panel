@@ -14,6 +14,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import { RiArrowUpDownFill } from "react-icons/Ri";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 // import { Product } from "@/lib/products";
 
 type InventoryViewData = {
@@ -26,17 +27,17 @@ type InventoryViewData = {
   currentAmount: number;
   history: [
     {
-      currentAmount: string;
+      addedAmount: number;
       datetime: string;
     }
   ];
 };
 
-async function deleteInventory(id: string) {
+async function deleteInventory(id: string, productId: string) {
   console.log(id);
   const res = await fetch("/api/deleteInventory", {
     method: "POST",
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ id, productId }),
   });
 
   if (res.ok) {
@@ -193,9 +194,7 @@ export const columns: ColumnDef<InventoryViewData>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(rowdata.product_name)
-              }
+              onClick={() => navigator.clipboard.writeText(rowdata.docId)}
             >
               Copy Product Name
             </DropdownMenuItem>
@@ -207,14 +206,21 @@ export const columns: ColumnDef<InventoryViewData>[] = [
               Copy Product Price
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem className="bg-green-400 text-white mt-2">
+              <Link href={`/inventory/addInventory/${rowdata.docId}`}>
+                View & Add Inventory
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem className="bg-blue-400 text-white mt-2">
-              Edit Details
+              <Link href={`/inventory/editInventory/${rowdata.docId}`}>
+                View & Edit Inventory
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="bg-red-400 text-white mt-2"
-              onClick={() => deleteInventory(rowdata.docId)}
+              onClick={() => deleteInventory(rowdata.docId, rowdata.productId)}
             >
-              Delete Product
+              Delete Inventory
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
