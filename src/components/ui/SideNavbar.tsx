@@ -6,6 +6,8 @@ import { FaUsers } from "react-icons/fa";
 import { LiaProductHunt } from "react-icons/lia";
 import { MdInventory } from "react-icons/Md";
 import { LuClipboardList } from "react-icons/Lu";
+import { BiSolidUser } from "react-icons/Bi";
+import { FaLayerGroup } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -25,6 +27,11 @@ const NavMenu = [
     text: "Customer",
     icon: <FaUsers className="w-6 h-6" />,
   },
+  // {
+  //   href: "/catagory",
+  //   text: "Catagory",
+  //   icon: <FaLayerGroup className="w-6 h-6" />,
+  // },
   {
     href: "/inventory",
     text: "Inventory",
@@ -35,15 +42,25 @@ const NavMenu = [
     text: "Sales",
     icon: <LuClipboardList className="w-6 h-6" />,
   },
+  {
+    href: "/users",
+    text: "Users",
+    icon: <BiSolidUser className="w-6 h-6" />,
+  },
 ];
 
-export default function SideNavbar() {
+type Props = {
+  Admin: boolean;
+};
+
+export default function SideNavbar({ Admin }: Props) {
   const path = usePathname();
 
   return (
     <div className="sticky min-h-screen top-0 flex flex-col p-4 pt-24 border-r-2 w-72 h-full">
       <ul className="flex flex-col gap-2">
         {NavMenu.map((menu, i) => {
+          if (menu.href == "/users" && !Admin) return null;
           return (
             <li key={i} className="w-full ">
               <Link

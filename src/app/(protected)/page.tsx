@@ -13,7 +13,7 @@ import { options } from "../api/auth/[...nextauth]/options";
 export default async function Home() {
   const session = await getServerSession(options);
   // const user = await services.EditAllInventory();
-  // console.log(user);
+  console.log(session?.user);
 
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">

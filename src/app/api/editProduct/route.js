@@ -10,7 +10,7 @@ export const POST = async (request) => {
   const data = await request.formData();
   console.log(data);
 
-  const file = data.get("file");
+  // const file = data.get("file");
   const docId = data.get("docId");
   const newProduct = {
     id: data.get("id"),

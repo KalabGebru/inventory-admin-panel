@@ -1,5 +1,7 @@
+import services from "@/services/connect";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 
 export const options: NextAuthOptions = {
   providers: [
@@ -21,22 +23,28 @@ export const options: NextAuthOptions = {
         // This is where you need to retrieve user data
         // to verify with credentials
         // Docs: https://next-auth.js.org/configuration/providers/credentials
-        const user = {
-          id: "22",
-          name: "KalabG",
-          email: "kg@gmail.com",
-          password: "nextauth",
-          role: "admin",
-        };
 
-        if (
-          credentials?.username === user.name &&
-          credentials?.password === user.password
-        ) {
-          return user;
-        } else {
-          return null;
-        }
+        const allUser = await services.GetAllUsers();
+        if (!allUser) return null;
+        console.log(credentials);
+        const user = allUser?.find(
+          (user) => user.username == credentials?.username
+        );
+        if (!user) return null;
+        console.log(user);
+        const passwordMatch = await bcrypt.compare(
+          credentials?.password ? credentials?.password : "",
+          user?.password
+        );
+        if (!passwordMatch) return null;
+        return {
+          id: user.docId,
+          name: user.username,
+          email: user.email,
+          image: user.image,
+          password: user.password,
+          role: user.role,
+        };
       },
     }),
   ],
@@ -48,11 +56,13 @@ export const options: NextAuthOptions = {
     // Ref: https://authjs.dev/guides/basics/role-based-access-control#persisting-the-role
     async jwt({ token, user }) {
       if (user) token.role = user.role;
+
       return token;
     },
     // If you want to use the role in client components
     async session({ session, token }) {
       if (session?.user) session.user.role = token.role;
+
       return session;
     },
   },

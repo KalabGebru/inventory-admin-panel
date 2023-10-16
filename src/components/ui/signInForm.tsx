@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
+import { BiSolidShow } from "react-icons/Bi";
+import { BiSolidHide } from "react-icons/Bi";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -31,6 +34,7 @@ const FormSchema = z.object({
 });
 
 export default function SignInForm() {
+  const [hidePassword, setHidePassword] = useState(true);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -76,7 +80,23 @@ export default function SignInForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
+                  <div className=" relative">
+                    <div
+                      className="absolute right-2 top-2 p-1 cursor-pointer"
+                      onClick={() => setHidePassword((pre) => !pre)}
+                    >
+                      {hidePassword ? (
+                        <BiSolidHide size={20} />
+                      ) : (
+                        <BiSolidShow size={20} />
+                      )}
+                    </div>
+                    <Input
+                      type={hidePassword ? "password" : "text"}
+                      placeholder="Password"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
                 {/* <FormDescription>Input your user password.</FormDescription> */}
                 <FormMessage />

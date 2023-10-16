@@ -26,6 +26,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "./textarea";
 import { useEffect, useState } from "react";
+import UploadImageToStorage from "./UploadImg";
+import Image from "next/image";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -47,7 +49,6 @@ const FormSchema = z.object({
     .max(160, {
       message: "Details must be at max 160 characters.",
     }),
-  image: z.string().url(),
 });
 
 type cat = {
@@ -78,8 +79,11 @@ export default function AddProductForm({
   editMode,
   docId,
 }: Props) {
-  const [file, setfile] = useState<File>();
+  // const [file, setfile] = useState<File>();
   const [catagorys, setCatagorys] = useState([]);
+  const [image, setImage] = useState(
+    editMode ? { image: defaultValue?.image } : { image: "" }
+  );
 
   const router = useRouter();
   const formData = new FormData();
@@ -102,7 +106,6 @@ export default function AddProductForm({
         defaultValue?.unit_price.replace(/[^0-9.-]+/g, "")
       ).toString(),
       details: defaultValue?.details,
-      image: defaultValue?.image,
     },
   });
 
@@ -114,10 +117,10 @@ export default function AddProductForm({
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    console.log(file);
+
     objectToFormData(data);
-    if (file) {
-      formData.append("file", file);
+    if (image.image) {
+      formData.append("image", image.image);
     }
 
     let res;
@@ -244,29 +247,27 @@ export default function AddProductForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image URL</FormLabel>
-                <FormControl>
-                  <Input type="url" placeholder="Image URL" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <FormLabel>Image File</FormLabel>
 
-          <Input
+          {/* <Input
             type="file"
             onChange={(e) => setfile(e.target.files?.[0])}
             required
             placeholder="Image File"
-          />
+          /> */}
+          <UploadImageToStorage setURL={setImage} />
+          {image.image && (
+            <div className="w-[200px] h-[200px] border rounded">
+              <Image
+                src={image.image}
+                alt={image.image}
+                className="bg-cover h-full"
+                width={200}
+                height={200}
+              />
+            </div>
+          )}
 
           <div className="flex justify-end">
             <Button type="submit">Submit</Button>
