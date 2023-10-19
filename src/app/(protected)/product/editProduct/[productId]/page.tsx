@@ -26,13 +26,11 @@ export default async function page({ params }: Props) {
   if (!userData) return null;
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <div className="w-full max-w-3xl border-2 rounded-lg">
-        <AddProductForm
-          editMode={true}
-          defaultValue={userData}
-          docId={params.productId}
-        />
-      </div>
+      <AddProductForm
+        editMode={true}
+        defaultValue={userData}
+        docId={params.productId}
+      />
     </div>
   );
 }

@@ -207,6 +207,23 @@ const services = {
       return undefined;
     }
   },
+  EditSales: async (id, newsales) => {
+    const salesref = doc(db, "Sales", id);
+
+    try {
+      await setDoc(
+        salesref,
+        {
+          ...newsales,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
   AddToInventory: async (id, addedAmount, currentAmount) => {
     console.log(id, addedAmount);
     const productsref = doc(db, "Inventory", id);
@@ -445,6 +462,17 @@ const services = {
       return null;
     }
   },
+  GetSalesById: async (id) => {
+    const salesref = doc(db, "Sales", id);
+
+    try {
+      const sales = await getDoc(salesref);
+
+      return sales.data();
+    } catch (err) {
+      return null;
+    }
+  },
   SubInventory: async (id, currentAmount) => {
     const productsref = doc(db, "Inventory", id);
 
@@ -481,39 +509,55 @@ const services = {
       return "something went wrong";
     }
   },
+  EditSalesOfCustomer: async (customerId, history) => {
+    const customersref = doc(db, "Customers", customerId);
+
+    try {
+      await setDoc(
+        customersref,
+        {
+          history: history,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return "something went wrong";
+    }
+  },
+
+  Ed: async (Data) => {
+    try {
+      const topProducts = await fetch("http://localhost:3000/api/topProducts", {
+        method: "POST",
+        body: JSON.stringify(Data),
+      });
+      console.log(topProducts);
+      if (topProducts.ok) {
+        const Response = await topProducts.json();
+        console.log(Response);
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      return "something went wrong";
+    }
+  },
 
   // EditAllInventory: async () => {
-  //   const productssref = collection(db, "Products");
+  //   const productssref = collection(db, "Customers");
   //   try {
   //     const data = await getDocs(productssref);
   //     const allproducts = data.docs.map((doc) => doc.data());
 
-  //     const inventoryref = collection(db, "Inventory");
-
   //     for (let i = 0; i < allproducts.length; i++) {
-  //       const data = await addDoc(inventoryref, {
-  //         productId: allproducts[i].docId,
-  //         history: [
-  //           { addedAmount: 30, datetime: "2023-10-10T08:42:35.263Z" },
-  //           { addedAmount: 20, datetime: "2023-11-10T08:42:35.263Z" },
-  //         ],
-  //         currentAmount: 50,
-  //         datetime: new Date().toISOString(),
-  //       });
-  //       const created = doc(db, "Inventory", data.id);
+  //       const created = doc(db, "Customers", allproducts[i].docId);
+
   //       await setDoc(
   //         created,
   //         {
-  //           docId: data.id,
-  //         },
-  //         { merge: true }
-  //       );
-
-  //       const product = doc(db, "Products", allproducts[i].docId);
-  //       await setDoc(
-  //         product,
-  //         {
-  //           invId: data.id,
+  //           credit: { allowed: Math.random() < 0.25, max: 0, used: 0 },
   //         },
   //         { merge: true }
   //       );

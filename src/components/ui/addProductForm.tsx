@@ -152,122 +152,134 @@ export default function AddProductForm({
 
   if (!catagorys) return null;
   return (
-    <div className="p-8 border rounded-md">
+    <div className="w-full max-w-5xl p-8 border rounded-md m-4">
       <div className="text-xl mb-8">Add a Product</div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <FormField
-            control={form.control}
-            name="id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="Product ID" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user name.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="product_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Product Name" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user name.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="catagory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Catagory</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Catagory" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {catagorys.map((cat: cat) => (
-                        <SelectItem value={cat.catagoryName}>
-                          {cat.catagoryName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="unit_price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unit Price</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Unit Price" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="details"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Details</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Input Discription of the Product"
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormLabel>Image File</FormLabel>
-
-          {/* <Input
-            type="file"
-            onChange={(e) => setfile(e.target.files?.[0])}
-            required
-            placeholder="Image File"
-          /> */}
-          <UploadImageToStorage setURL={setImage} />
-          {image.image && (
-            <div className="w-[200px] h-[200px] border rounded">
-              <Image
-                src={image.image}
-                alt={image.image}
-                className="bg-cover h-full"
-                width={200}
-                height={200}
+          <div className="flex flex-wrap gap-6">
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product ID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product ID" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>Input your user name.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          )}
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="product_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product Name" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>Input your user name.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="catagory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Catagory</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Catagory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {catagorys.map((cat: cat) => (
+                            <SelectItem value={cat.catagoryName}>
+                              {cat.catagoryName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="unit_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unit Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Unit Price"
+                        {...field}
+                      />
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-[600px]">
+              <FormField
+                control={form.control}
+                name="details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Details</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Input Discription of the Product"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex flex-col gap-4 w-full xl:w-[600px] ">
+              <FormLabel>Image File</FormLabel>
+
+              <UploadImageToStorage setURL={setImage} path="product/" />
+
+              <div className="w-[200px] h-[200px] border-2 rounded-md">
+                {image.image && (
+                  <Image
+                    src={image.image}
+                    alt={image.image}
+                    className="bg-cover h-full"
+                    width={200}
+                    height={200}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
 
           <div className="flex justify-end">
             <Button type="submit">Submit</Button>

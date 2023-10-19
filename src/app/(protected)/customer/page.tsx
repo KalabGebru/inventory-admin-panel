@@ -9,13 +9,14 @@ import {
 import CustomerDataTable from "./data-table";
 import services from "@/services/connect";
 import { columns } from "./columns";
+import TopCard from "@/components/ui/topCard";
 // import { people } from "@/lib/customers";
 
 type Customer = {
   docId: string;
   first_name: string;
   last_name: string;
-  credit: { amount: number; used: number };
+  credit: { allowed: boolean; max: number; used: number };
   email: string;
   gender: string;
   phone_number: string;
@@ -39,66 +40,27 @@ export default async function Home() {
   return (
     <main className="flex flex-col h-full w-full p-12 gap-8">
       <div className="flex gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Buyer</CardTitle>
-            <CardDescription>John Doe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">20</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold"> Money Spent: </span>
-              <span className="text-xl ">5000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Buyer</CardTitle>
-            <CardDescription>John Doe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">20</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold"> Money Spent: </span>
-              <span className="text-xl ">5000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Buyer</CardTitle>
-            <CardDescription>John Doe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">20</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold"> Money Spent: </span>
-              <span className="text-xl ">5000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
+        <TopCard
+          min="2023-10-10"
+          max="2023-10-17"
+          no={1}
+          path="topCustomers"
+          timeLabel="This Week"
+        />
+        <TopCard
+          min="2023-10-10"
+          max="2023-10-17"
+          no={1}
+          path="topCustomers"
+          timeLabel="This Week"
+        />
+        <TopCard
+          min="2023-10-10"
+          max="2023-10-17"
+          no={1}
+          path="topCustomers"
+          timeLabel="This Week"
+        />
       </div>
       <div className="">
         <CustomerDataTable

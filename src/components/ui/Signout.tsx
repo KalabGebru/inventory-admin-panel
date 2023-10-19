@@ -1,6 +1,7 @@
 "use client";
 // import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { Button } from "./button";
 
 export default function Signout() {
   // const router = useRouter();
@@ -15,11 +16,8 @@ export default function Signout() {
   }
 
   return (
-    <button
-      onClick={LogOutFun}
-      className="px-4 py-2 text-white bg-blue-500 rounded"
-    >
+    <Button variant="secondary" onClick={LogOutFun}>
       Sign out
-    </button>
+    </Button>
   );
 }

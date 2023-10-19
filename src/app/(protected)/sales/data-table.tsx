@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { FiFilter } from "react-icons/fi";
 import { BsFilterRight } from "react-icons/bs";
+import { SalseToExcel, downloadToExcel } from "@/lib/xlsx";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,7 +45,7 @@ export function ProductDataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "datetime", desc: false },
+    { id: "datetime", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -56,6 +57,8 @@ export function ProductDataTable<TData, TValue>({
   const [paidFilter, setPaidFilter] = useState<string[]>([]);
 
   console.log(columnFilters);
+
+  console.log(data);
 
   const table = useReactTable({
     data,
@@ -134,7 +137,7 @@ export function ProductDataTable<TData, TValue>({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {["cash", "credit", "mixed"].map((p, i) => {
+              {["Cash", "Credit"].map((p, i) => {
                 return (
                   <DropdownMenuCheckboxItem
                     key={i}
@@ -153,7 +156,15 @@ export function ProductDataTable<TData, TValue>({
                       console.log(paidFilter);
                     }}
                   >
-                    {p}
+                    <div
+                      className={`flex items-center justify-center font-bold rounded rouned w-full px-2 ${
+                        p == "Cash"
+                          ? "bg-green-400  text-green-900"
+                          : "bg-yellow-400  text-yellow-900"
+                      }`}
+                    >
+                      <div className="">{p}</div>
+                    </div>
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -206,6 +217,11 @@ export function ProductDataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-8">
+          <div className="">
+            <Button variant="secondary" onClick={() => SalseToExcel(data)}>
+              Export Sales To Excel
+            </Button>
+          </div>
           <div className="">
             <Button asChild>
               <Link href="/sales/addSales">Add Sales</Link>

@@ -46,7 +46,7 @@ type Customer = {
   docId: string;
   first_name: string;
   last_name: string;
-  credit: { amount: number; used: number };
+  credit: { allowed: boolean; max: number; used: number };
   email: string;
   gender: string;
   phone_number: string;
@@ -57,10 +57,11 @@ type Customer = {
 type Props = {
   list: Customer[];
   setCustomer: any;
+  defultValue?: string;
 };
-export function Combobox({ list, setCustomer }: Props) {
+export function Combobox({ list, setCustomer, defultValue }: Props) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState(defultValue ? defultValue : "");
   console.log(value);
   const FW = list.map((c) => {
     return {

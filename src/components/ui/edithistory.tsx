@@ -48,9 +48,9 @@ export default function EditHistory({ his, func, index }: Props) {
             </div>
           ) : (
             <div className="flex flex-wrap w-full items-center justify-between">
-              <div className="">
+              <div className="flex gap-2">
                 <span className="bg-gray-400 p-1 rounded">Amount Added:</span>
-                {` ${value}`}
+                <div className="text-xl">{` ${value}`}</div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="">

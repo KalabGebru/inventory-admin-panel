@@ -30,16 +30,7 @@ export default async function page({ params }: Props) {
   };
   return (
     <div className="flex items-center justify-center p-24">
-      <div className="flex items-center gap-2"></div>
-      <div className="w-96 border">
-        <Card className="p-2">
-          <CardHeader>Edit Users</CardHeader>
-          <CardContent>
-            <EditUsers user={user} />
-          </CardContent>
-        </Card>
-      </div>
-      <div className=""></div>
+      <EditUsers user={user} />
     </div>
   );
 }

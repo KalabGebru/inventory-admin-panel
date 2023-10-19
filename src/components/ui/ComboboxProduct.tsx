@@ -58,10 +58,11 @@ type Product = {
 type Props = {
   list: Product[];
   setItems: any;
+  defultValue?: Product[];
 };
-export function ComboboxProduct({ list, setItems }: Props) {
+export function ComboboxProduct({ list, setItems, defultValue }: Props) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState([]);
+  const [value, setValue] = React.useState(defultValue ? defultValue : []);
   console.log(value);
   const FW = list.map((c) => {
     return {

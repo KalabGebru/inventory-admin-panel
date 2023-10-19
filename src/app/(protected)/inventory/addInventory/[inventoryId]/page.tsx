@@ -41,13 +41,11 @@ export default async function page({ params }: Props) {
 
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <div className="w-full max-w-3xl border-2 rounded-lg">
-        <AddInventoryForm
-          product={product}
-          inventoryId={params.inventoryId}
-          inventory={inventory}
-        />
-      </div>
+      <AddInventoryForm
+        product={product}
+        inventoryId={params.inventoryId}
+        inventory={inventory}
+      />
     </div>
   );
 }

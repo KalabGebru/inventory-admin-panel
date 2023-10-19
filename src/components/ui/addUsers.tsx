@@ -27,6 +27,7 @@ import {
 } from "./select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Card, CardContent, CardHeader } from "./card";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -91,106 +92,109 @@ export function AddUsers() {
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="Username" {...field} />
-              </FormControl>
-              {/* <FormDescription>
+    <div className="w-full max-w-xl m-4 flex flex-col gap-4 p-8 border rounded-md">
+      <div className="text-xl mb-8">Add Users</div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Username" {...field} />
+                </FormControl>
+                {/* <FormDescription>
                 This is a username that will be used to sign in.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Email" {...field} />
-              </FormControl>
-              {/* <FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="Email" {...field} />
+                </FormControl>
+                {/* <FormDescription>
                 This is a username that will be used to sign in.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <div className=" relative">
-                  <div
-                    className="absolute right-2 top-2 p-1 cursor-pointer"
-                    onClick={() => setHidePassword((pre) => !pre)}
-                  >
-                    {hidePassword ? (
-                      <BiSolidHide size={20} />
-                    ) : (
-                      <BiSolidShow size={20} />
-                    )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <div className=" relative">
+                    <div
+                      className="absolute right-2 top-2 p-1 cursor-pointer"
+                      onClick={() => setHidePassword((pre) => !pre)}
+                    >
+                      {hidePassword ? (
+                        <BiSolidHide size={20} />
+                      ) : (
+                        <BiSolidShow size={20} />
+                      )}
+                    </div>
+                    <Input
+                      type={hidePassword ? "password" : "text"}
+                      placeholder="Password"
+                      {...field}
+                    />
                   </div>
-                  <Input
-                    type={hidePassword ? "password" : "text"}
-                    placeholder="Password"
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-              {/* <FormDescription>
+                </FormControl>
+                {/* <FormDescription>
                 This is a password that will be used to sign in.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>User Role</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              {/* <FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>User Role</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {/* <FormDescription>
                 This is a will access level of the user.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex justify-end items-center w-full mt-2">
-          <Button type="submit">Submit</Button>
-        </div>
-      </form>
-    </Form>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex justify-end items-center w-full mt-2">
+            <Button type="submit">Submit</Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

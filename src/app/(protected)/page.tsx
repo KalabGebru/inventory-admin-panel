@@ -9,6 +9,7 @@ import {
 import services from "@/services/connect";
 import { getServerSession } from "next-auth";
 import { options } from "../api/auth/[...nextauth]/options";
+import ApiCall from "@/components/ui/ApiCall";
 
 export default async function Home() {
   const session = await getServerSession(options);
@@ -79,8 +80,9 @@ export default async function Home() {
         </CardFooter> */}
         </Card>
       </div>
-      <div className="w-full h-full bg-green-300">
+      <div className="w-full h-full">
         <div className=" text-white text-3xl">{session?.user.role}</div>
+        <ApiCall />
       </div>
     </main>
   );

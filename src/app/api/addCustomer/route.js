@@ -8,16 +8,18 @@ export const POST = async (request) => {
     gender,
     phone_number,
     discount,
-    creditAmount,
-    creditUsed,
+    max,
+    used,
+    allowed,
   } = await request.json();
 
   try {
     const newCustomer = {
       id: 101,
       credit: {
-        amount: Number(creditAmount),
-        used: Number(creditUsed),
+        allowed: allowed,
+        max: Number(max),
+        used: Number(used),
       },
       email,
       first_name,

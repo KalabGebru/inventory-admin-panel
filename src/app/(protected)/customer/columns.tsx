@@ -16,7 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 // import { Customer } from "@/lib/customers";
 
-type credit = { amount: number; used: number };
+type credit = { allowed: boolean; max: number; used: number };
+
 type Customer = {
   docId: string;
   first_name: string;
@@ -128,13 +129,51 @@ export const columns: ColumnDef<Customer>[] = [
     },
   },
   {
-    header: "Credit",
+    header: "Credit Allowed",
+    accessorKey: "credit",
+    cell: ({ row }) => {
+      const credit: credit = row.getValue("credit");
+      return credit.allowed ? (
+        <div className="flex w-16 items-center justify-center bg-green-400 font-bold rounded rouned text-green-900">
+          <div className="">True</div>
+        </div>
+      ) : (
+        <div className="flex w-16 items-center justify-center bg-red-400 font-bold rounded text-red-900">
+          <div className="">False</div>
+        </div>
+      );
+    },
+    enableColumnFilter: true,
+    filterFn: (row, columnId, filterStatuses) => {
+      if (filterStatuses.length === 0) return true;
+      const credit: any = row.getValue(columnId);
+      // value => two date input values
+      console.log(filterStatuses);
+      console.log(credit);
+      //If one filter defined and date is null filter it
+      if (filterStatuses.includes(credit.allowed)) return true;
+      else return false;
+    },
+  },
+  {
+    header: "Credit used",
     accessorKey: "credit",
     cell: ({ row }) => {
       const credit: credit = row.getValue("credit");
       return (
-        <div className="font-medium">{`${credit.amount} - ${credit.used}`}</div>
+        <div className="font-medium">{credit.allowed ? credit.used : null}</div>
       );
+    },
+    enableColumnFilter: true,
+    filterFn: (row, columnId, filterStatuses) => {
+      if (filterStatuses.length === 0) return true;
+      const credit: any = row.getValue(columnId);
+      // value => two date input values
+      console.log(filterStatuses);
+      console.log(credit);
+      //If one filter defined and date is null filter it
+      if (filterStatuses.includes(credit.allowed)) return true;
+      else return false;
     },
   },
   {

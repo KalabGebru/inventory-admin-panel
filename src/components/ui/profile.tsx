@@ -186,7 +186,9 @@ export default function Profile({ user }: Props) {
           </div>
         </div>
 
-        {editImage && <UploadImageToStorage setURL={setCurrentUserData} />}
+        {editImage && (
+          <UploadImageToStorage setURL={setCurrentUserData} path="image/" />
+        )}
 
         {changePassword ? (
           <div className="flex flex-col items-center gap-2 justify-center w-full">

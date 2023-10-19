@@ -16,9 +16,7 @@ export default async function page() {
   const productData = (await services.GetAllProducts()) as Product[];
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <div className="w-full max-w-3xl border-2 rounded-lg">
-        <CreateInventoryForm product={productData} />
-      </div>
+      <CreateInventoryForm product={productData} />
     </div>
   );
 }

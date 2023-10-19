@@ -11,7 +11,7 @@ export default async function RootLayout({
   const session = await getServerSession(options);
   return (
     <div className="flex w-full">
-      <SideNavbar Admin={session?.user.role === "admin"} />
+      <SideNavbar Admin={session?.user.role === "admin"} session={session} />
       <div className="min-h-screen w-full">
         <div className="sticky top-0">
           <Navbar />

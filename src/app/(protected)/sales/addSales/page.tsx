@@ -5,7 +5,7 @@ type Customer = {
   docId: string;
   first_name: string;
   last_name: string;
-  credit: { amount: number; used: number };
+  credit: { allowed: boolean; max: number; used: number };
   email: string;
   gender: string;
   phone_number: string;
@@ -39,13 +39,11 @@ export default async function page() {
   const inventoryData = (await services.GetAllInventorys()) as Inventory[];
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <div className="w-full max-w-3xl border-2 rounded-lg">
-        <AddSalesForm
-          customers={customersData}
-          product={productData}
-          inventory={inventoryData}
-        />
-      </div>
+      <AddSalesForm
+        customers={customersData}
+        product={productData}
+        inventory={inventoryData}
+      />
     </div>
   );
 }

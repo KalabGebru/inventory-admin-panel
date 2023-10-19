@@ -1,21 +1,22 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import { FaHome } from "react-icons/fa";
-import { FaUsers } from "react-icons/fa";
-import { LiaProductHunt } from "react-icons/lia";
-import { MdInventory } from "react-icons/Md";
-import { LuClipboardList } from "react-icons/Lu";
-import { BiSolidUser } from "react-icons/Bi";
-import { FaLayerGroup } from "react-icons/fa";
+import { AiOutlineHome } from "react-icons/ai";
+import { HiOutlineClipboardList } from "react-icons/hi";
+import { LiaProductHunt, LiaUserSolid } from "react-icons/lia";
+import { MdOutlineInventory2 } from "react-icons/Md";
+import { BsChevronBarLeft, BsChevronBarRight } from "react-icons/bs";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Button } from "./button";
+import { FiMoreVertical, FiUsers } from "react-icons/fi";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 
 const NavMenu = [
   {
     href: "/",
     text: "Home",
-    icon: <FaHome className="w-6 h-6 " />,
+    icon: <AiOutlineHome className="w-6 h-6 " />,
   },
   {
     href: "/product",
@@ -25,7 +26,7 @@ const NavMenu = [
   {
     href: "/customer",
     text: "Customer",
-    icon: <FaUsers className="w-6 h-6" />,
+    icon: <FiUsers className="w-6 h-6" />,
   },
   // {
   //   href: "/catagory",
@@ -35,49 +36,137 @@ const NavMenu = [
   {
     href: "/inventory",
     text: "Inventory",
-    icon: <MdInventory className="w-6 h-6" />,
+    icon: <MdOutlineInventory2 className="w-6 h-6" />,
   },
   {
     href: "/sales",
     text: "Sales",
-    icon: <LuClipboardList className="w-6 h-6" />,
+    icon: <HiOutlineClipboardList className="w-6 h-6" />,
   },
   {
     href: "/users",
     text: "Users",
-    icon: <BiSolidUser className="w-6 h-6" />,
+    icon: <LiaUserSolid className="w-6 h-6" />,
   },
 ];
 
 type Props = {
   Admin: boolean;
+  session: any;
 };
 
-export default function SideNavbar({ Admin }: Props) {
+export default function SideNavbar({ Admin, session }: Props) {
+  const [expanded, setExpanded] = useState(true);
   const path = usePathname();
 
   return (
-    <div className="sticky min-h-screen top-0 flex flex-col p-4 pt-24 border-r-2 w-72 h-full">
-      <ul className="flex flex-col gap-2">
+    <aside className="sticky max-h-screen top-0 flex flex-col border-r shadow-sm">
+      <div className="flex items-center justify-between mb-32 p-4">
+        <div
+          className={`overflow-hidden text-2xl transition-all ${
+            expanded ? "w-fit" : "w-0"
+          }`}
+        >
+          <span className="text-green-300 font-bold">Admin</span>Logo
+        </div>
+
+        <Button
+          variant={"ghost"}
+          className="py-2 px-3"
+          onClick={() => setExpanded((pre) => !pre)}
+        >
+          {expanded ? (
+            <BsChevronBarLeft size={24} />
+          ) : (
+            <BsChevronBarRight size={24} />
+          )}
+        </Button>
+      </div>
+      <ul className="flex-1 flex-col gap-2 p-4">
         {NavMenu.map((menu, i) => {
           if (menu.href == "/users" && !Admin) return null;
           return (
-            <li key={i} className="w-full ">
-              <Link
-                href={menu.href}
-                className={`flex items-center w-full h-12 md:h-10 gap-3 px-4 py-1 rounded-lg hover:bg-black/10 ${
-                  menu.href == path
-                    ? "dark:bg-white bg-black text-white dark:text-black"
-                    : "text-black dark:text-white"
-                }`}
-              >
-                {menu.icon}
-                <span className="text-base lg:text-xl">{menu.text}</span>
-              </Link>
-            </li>
+            <SidebarItem
+              key={i}
+              text={menu.text}
+              icon={menu.icon}
+              href={menu.href}
+              active={
+                (menu.href != "/" && path.startsWith(menu.href)) ||
+                (menu.href == "/" && menu.href == path)
+              }
+              expanded={expanded}
+            />
           );
         })}
       </ul>
-    </div>
+      <div className="flex items-center gap-2 border-t p-3">
+        <Link href={`/profile/${session?.user.name}`}>
+          <div className="w-12 h-12 rounded-full">
+            <Avatar>
+              <AvatarImage
+                src={session?.user.image as string}
+                alt={session?.user.name}
+              />
+              <AvatarFallback>
+                {session?.user.name.slice(0, 2).toLocaleUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        </Link>
+        <div
+          className={`overflow-hidden flex justify-between items-center transition-all ${
+            expanded ? "w-52 ml-3" : "w-0"
+          }`}
+        >
+          <div className="leading-4">
+            <h4 className="font-semibold">
+              {session?.user.name.toLocaleUpperCase()}
+            </h4>
+            <span className="text-xs text-gray-400">{session?.user.email}</span>
+          </div>
+          <Button variant={"ghost"} className="px-1">
+            <FiMoreVertical size={24} />
+          </Button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+type SProps = {
+  icon: any;
+  text: string;
+  active: boolean;
+  href: string;
+  expanded: boolean;
+};
+
+export function SidebarItem({ icon, text, active, href, expanded }: SProps) {
+  return (
+    <li className="relative w-full group my-1">
+      <Link
+        href={href}
+        className={`flex items-center font-medium py-2 px-3 rounded-md cursor-pointer transition-colors${
+          active
+            ? " bg-gradient-to-tr from-green-400 to-green-300 text-green-900"
+            : ""
+        }`}
+      >
+        {icon}
+        <span
+          className={`overflow-hidden transition-all ${
+            expanded ? "w-52 ml-3" : "w-0"
+          }`}
+        >
+          {text}
+        </span>
+      </Link>
+      {!expanded && (
+        <div className="absolute top-1/2 -translate-y-1/2 left-full rounded-md px-2 py-1 ml-6 bg-green-300 text-black invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0">
+          {text}
+        </div>
+      )}
+    </li>
   );
 }

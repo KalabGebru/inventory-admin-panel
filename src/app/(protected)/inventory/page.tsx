@@ -10,6 +10,7 @@ import {
 import { columns } from "./columns";
 import services from "@/services/connect";
 import InventoryDataTable from "./data-table";
+import InvCard from "@/components/ui/InvCard";
 
 type Product = {
   image: string;
@@ -60,66 +61,8 @@ export default async function Home() {
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
       <div className="flex gap-8">
-        <Card className="">
-          <CardHeader>
-            <CardTitle>Top Product</CardTitle>
-            <CardDescription>beer 123</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">40</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Total Money: </span>
-              <span className="text-xl ">6000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Buyer</CardTitle>
-            <CardDescription>John Doe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">20</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold"> Money Spent: </span>
-              <span className="text-xl ">5000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Buyer</CardTitle>
-            <CardDescription>John Doe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold">Bought Item:</span>{" "}
-              <span className="text-xl ">20</span>
-            </h1>
-            <h1 className="flex gap-2">
-              <span className="text-xl font-bold"> Money Spent: </span>
-              <span className="text-xl ">5000</span>
-            </h1>
-          </CardContent>
-          {/* <CardFooter className="flex justify-between">
-          <Button variant="outline">Cancel</Button>
-          <Button>Deploy</Button>
-        </CardFooter> */}
-        </Card>
+        <InvCard no={1} Labal="Product" />
+        <InvCard no={1} Labal="Catagory" />
       </div>
       <div className="">
         <InventoryDataTable

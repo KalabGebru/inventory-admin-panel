@@ -80,12 +80,12 @@ export default function AddInventoryForm({
   }
 
   return (
-    <div className="p-8 border rounded-md">
+    <div className="w-full max-w-2xl p-8 border rounded-md m-4">
       <div className="text-xl mb-8">Add To Inventory</div>
 
       <Card className="mb-4">
         <CardContent className="flex p-4 gap-4">
-          <div className="w-24">
+          <div className="w-44">
             <Image
               src={product.image}
               alt={product.product_name}
@@ -94,20 +94,20 @@ export default function AddInventoryForm({
               className="h-full w-full bg-cover"
             />
           </div>
-          <div className="">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl">{product.product_name}</h1>
             <div className="text-gray-400 text-sm">{product.details}</div>
-            <div className="">
+            <div className="flex gap-2">
               <span className="bg-gray-400 rounded px-1">ProductId : </span>
-              {product.id}
+              <div className="">{product.id}</div>
             </div>
-            <div className="">
+            <div className="flex gap-2">
               <span className="bg-gray-400 rounded px-1">Catagory :</span>{" "}
-              {product.catagory}
+              <div className="">{product.catagory}</div>
             </div>
-            <div className="">
+            <div className="flex gap-2">
               <span className="bg-gray-400 rounded px-1">price : </span>
-              {product.unit_price}
+              <div className="">{product.unit_price}</div>
             </div>
           </div>
         </CardContent>
@@ -121,15 +121,17 @@ export default function AddInventoryForm({
                 <Card className="mb-4">
                   <CardContent className="flex p-4 gap-4">
                     <div className="flex flex-wrap w-full items-center justify-between">
-                      <div className="">
+                      <div className="flex gap-2">
                         <span className="bg-gray-400 p-1 rounded">
                           Amount Added:
                         </span>
-                        {` ${h.addedAmount}`}
+                        <div className="text-xl"> {` ${h.addedAmount}`}</div>
                       </div>
-                      <div className="">
+                      <div className="flex gap-2">
                         <span className="bg-gray-400 p-1 rounded">Date:</span>
-                        {` ${new Date(h.datetime).toUTCString()}`}
+                        <div className="">
+                          {` ${new Date(h.datetime).toUTCString()}`}
+                        </div>
                       </div>
                     </div>
                   </CardContent>

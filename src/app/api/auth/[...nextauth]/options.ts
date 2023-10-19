@@ -55,13 +55,24 @@ export const options: NextAuthOptions = {
   callbacks: {
     // Ref: https://authjs.dev/guides/basics/role-based-access-control#persisting-the-role
     async jwt({ token, user }) {
-      if (user) token.role = user.role;
-
+      console.log(token);
+      console.log(user);
+      if (user) {
+        token.role = user.role;
+        token.picture = user.image;
+      }
+      console.log(token);
+      console.log(user);
       return token;
     },
     // If you want to use the role in client components
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       if (session?.user) session.user.role = token.role;
+      console.log(session);
+      console.log(user);
+
+      if (session.user.user !== undefined)
+        session.user.user.image = token.picture;
 
       return session;
     },

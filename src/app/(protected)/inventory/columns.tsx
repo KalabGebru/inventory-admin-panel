@@ -147,7 +147,7 @@ export const columns: ColumnDef<InventoryViewData>[] = [
           }}
           className="pl-0"
         >
-          last Added Date
+          Last Added Date
           <RiArrowUpDownFill size={16} />
         </Button>
       );

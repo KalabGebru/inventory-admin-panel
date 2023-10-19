@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { FiFilter } from "react-icons/fi";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,6 +45,8 @@ export function CustomerDataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  const [creditFilter, setCreditFilter] = useState<boolean[]>([]);
 
   //   console.log(rowSelection);
 
@@ -68,11 +71,21 @@ export function CustomerDataTable<TData, TValue>({
     },
   });
 
+  useEffect(() => {
+    setColumnFilters((pre) => [
+      ...pre,
+      {
+        id: "credit",
+        value: creditFilter,
+      },
+    ]);
+  }, [creditFilter]);
+
   return (
     <div className="">
       {/* input */}
       <div className="flex items-center justify-between my-4">
-        <div className="">
+        <div className="flex gap-6">
           <Input
             placeholder="Filter First name"
             value={
@@ -83,6 +96,47 @@ export function CustomerDataTable<TData, TValue>({
             }}
             className="w-full md:min-w-[400px]"
           />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto min-w-fit">
+                <FiFilter size={16} />
+                <div className="pl-2">Credit Allowed</div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {[true, false].map((p, i) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={i}
+                    className="capitalize"
+                    checked={creditFilter.includes(p)}
+                    onCheckedChange={(value) => {
+                      const arr = creditFilter;
+                      if (value) {
+                        //checking weather array contain the id
+                        arr.push(p); //adding to array because value doesnt exists
+                      } else {
+                        arr.splice(arr.indexOf(p), 1); //deleting
+                      }
+                      console.log(arr);
+                      setCreditFilter([...arr]);
+                      console.log(creditFilter);
+                    }}
+                  >
+                    <div
+                      className={`flex items-center justify-center font-bold rounded rouned w-full px-2 ${
+                        p == true
+                          ? "bg-green-400  text-green-900"
+                          : "bg-yellow-400  text-yellow-900"
+                      }`}
+                    >
+                      <div className="">{p ? "True" : "False"}</div>
+                    </div>
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="flex items-center gap-8">
           <div className="">

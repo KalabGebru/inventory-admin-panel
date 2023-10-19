@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Checkbox } from "./checkbox";
 
 const FormSchema = z.object({
   first_name: z.string().min(2, {
@@ -42,8 +44,8 @@ const FormSchema = z.object({
     .max(9, {
       message: "Phone number must be at '251' + 9 characters.",
     }),
-  creditAmount: z.string(),
-  creditUsed: z.string(),
+  // creditAmount: z.string(),
+  // creditUsed: z.string(),
   discount: z
     .string()
     .min(0, {
@@ -58,7 +60,7 @@ type Customer = {
   docId: string;
   first_name: string;
   last_name: string;
-  credit: { amount: number; used: number };
+  credit: { allowed: boolean; max: number; used: number };
   email: string;
   gender: string;
   phone_number: string;
@@ -77,6 +79,10 @@ export default function AddCustomerForm({
   editMode,
   docId,
 }: Props) {
+  const [allowed, setAllowed] = useState(false);
+  const [max, setMax] = useState(editMode ? defaultValue?.credit.max : 0);
+  const [used, setUsed] = useState(editMode ? defaultValue?.credit.used : 0);
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -87,8 +93,8 @@ export default function AddCustomerForm({
       gender: defaultValue?.gender,
       email: defaultValue?.email,
       phone_number: defaultValue?.phone_number.toString(),
-      creditAmount: defaultValue?.credit.amount.toString(),
-      creditUsed: defaultValue?.credit.used.toString(),
+      // creditAmount: defaultValue?.credit.max.toString(),
+      // creditUsed: defaultValue?.credit.used.toString(),
       discount: defaultValue?.discount.toString(),
     },
   });
@@ -100,6 +106,9 @@ export default function AddCustomerForm({
     if (editMode && docId) {
       const newData = {
         ...data,
+        allowed: allowed,
+        max: max,
+        used: used,
         docId: docId,
       };
       res = await fetch("/api/editCustomer", {
@@ -107,9 +116,16 @@ export default function AddCustomerForm({
         body: JSON.stringify(newData),
       });
     } else {
+      const newData = {
+        ...data,
+        allowed: allowed,
+        max: max,
+        used: used,
+      };
+
       res = await fetch("/api/addCustomer", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(newData),
       });
     }
 
@@ -121,152 +137,180 @@ export default function AddCustomerForm({
   }
 
   return (
-    <div className="p-8 border rounded-md">
+    <div className="w-full max-w-5xl p-8 border rounded-md m-4">
       <div className="text-xl mb-8">Add a Customer</div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <FormField
-            control={form.control}
-            name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="First Name" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user name.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="last_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Last Name" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="Email" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Phone Number" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-wrap gap-4">
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="First Name" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>Input your user name.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Last Name" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Email" {...field} />
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Phone Number"
+                        {...field}
+                      />
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
-          <FormField
-            control={form.control}
-            name="creditAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Credit Allowed For The Customer</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="5000" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="creditUsed"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Credit Used For The Customer</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="5000" {...field} />
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex items-center gap-4 mb-2">
+            <Checkbox
+              id="allow"
+              checked={allowed}
+              onCheckedChange={() => setAllowed((pre) => !pre)}
+            />
+            <label htmlFor="allow">Credit Allowed</label>
+          </div>
 
-          <FormField
-            control={form.control}
-            name="discount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Discount</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Discount" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">0%</SelectItem>
-                      <SelectItem value="5">5%</SelectItem>
-                      <SelectItem value="10">10%</SelectItem>
-                      <SelectItem value="15">15%</SelectItem>
-                      <SelectItem value="20">20%</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Female">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                {/* <FormDescription>Input your user password.</FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {allowed ? (
+            <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col gap-2 w-full xl:w-96">
+                <label htmlFor="max">Credit Allowed For The Customer</label>
+                <Input
+                  id="max"
+                  type="number"
+                  placeholder="5000"
+                  min={0}
+                  value={max}
+                  onChange={(e) => setMax(Number(e.target.value))}
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full xl:w-96">
+                <label htmlFor="max">Credit Used by The Customer</label>
+                <Input
+                  id="max"
+                  type="number"
+                  placeholder="5000"
+                  min={0}
+                  value={used}
+                  onChange={(e) => setUsed(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap gap-4">
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="discount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Discount</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Discount" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0%</SelectItem>
+                          <SelectItem value="5">5%</SelectItem>
+                          <SelectItem value="10">10%</SelectItem>
+                          <SelectItem value="15">15%</SelectItem>
+                          <SelectItem value="20">20%</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full xl:w-96">
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    {/* <FormDescription>Input your user password.</FormDescription> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <Button type="submit">Submit</Button>
           </div>

@@ -5,8 +5,9 @@ import { type } from "os";
 
 type props = {
   setURL: any;
+  path: string;
 };
-const UploadImageToStorage = ({ setURL }: props) => {
+const UploadImageToStorage = ({ setURL, path }: props) => {
   const [imageFile, setImageFile] = useState<File>();
   const [isUploading, setIsUploading] = useState(false);
   const [progressUpload, setProgressUpload] = useState(0);
@@ -24,7 +25,7 @@ const UploadImageToStorage = ({ setURL }: props) => {
   const handleUploadFile = () => {
     if (imageFile) {
       const name = imageFile.name;
-      const storageRef = ref(storage, `image/${name}`);
+      const storageRef = ref(storage, `${path}${name}`);
       setIsUploading(true);
       const uploadTask = uploadBytesResumable(storageRef, imageFile);
 

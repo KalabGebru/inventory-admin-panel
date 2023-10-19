@@ -48,7 +48,7 @@ export default function CreateInventoryForm({ product }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-8 border rounded-md ">
+    <div className="w-full max-w-3xl p-8 border rounded-md m-4 flex flex-col gap-4">
       <div className="text-xl mb-8">Create Inventory</div>
 
       <div className="">
@@ -64,7 +64,7 @@ export default function CreateInventoryForm({ product }: Props) {
                     alt={items.product_name}
                     width={100}
                     height={200}
-                    className="w-full h-full bg-contain"
+                    className="w-full h-full bg-cover"
                   />
                 </div>
                 <div className="w-full">
@@ -103,7 +103,7 @@ export default function CreateInventoryForm({ product }: Props) {
               )}
             </div>
           ) : (
-            <div className="">not selected</div>
+            <div className="text-gray-400">No product is selected</div>
           )}
         </div>
       </div>

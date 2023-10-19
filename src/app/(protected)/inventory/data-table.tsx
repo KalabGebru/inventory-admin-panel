@@ -52,7 +52,7 @@ export function InventoryDataTable<TData, TValue>({
   catagory,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "datetime", desc: false },
+    { id: "datetime", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
