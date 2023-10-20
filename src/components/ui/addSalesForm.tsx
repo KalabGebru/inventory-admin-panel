@@ -1,20 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -23,15 +11,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "./textarea";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Combobox } from "./Combobox";
 import { ComboboxProduct } from "./ComboboxProduct";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { Checkbox } from "./checkbox";
-import { Label } from "@radix-ui/react-dropdown-menu";
 
 type Sales = {
   customer: string;
