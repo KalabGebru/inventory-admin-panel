@@ -113,6 +113,20 @@
   }
 }
 
+/* loading animation */
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+}
+
+.circle {
+  @apply w-4 h-4 mx-1 my-12 bg-gray-500 rounded-full;
+}
+
 @layer base {
   * {
     @apply border-border;

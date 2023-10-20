@@ -97,7 +97,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
       return alert(`you haven't selected products`);
     }
 
-    if (paidIn === "credit") {
+    if (paidIn === "credit" && customer.credit.max != 0) {
       const left = customer.credit.max - customer.credit.used;
       if (Total > left)
         return alert(

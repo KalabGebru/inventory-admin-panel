@@ -114,6 +114,24 @@ const services = {
         },
         { merge: true }
       );
+      if (Sales.paidIn == "credit") {
+        const createdref = doc(db, "Customer", Sales.customer);
+
+        const product = await getDoc(customersref);
+
+        const custmerdata = product.data();
+
+        await setDoc(
+          createdref,
+          {
+            credit: {
+              ...custmerdata.credit,
+              used: custmerdata.credit.used + Number(Sales.totalAmount),
+            },
+          },
+          { merge: true }
+        );
+      }
       return data.id;
     } catch (err) {
       console.log(err);
