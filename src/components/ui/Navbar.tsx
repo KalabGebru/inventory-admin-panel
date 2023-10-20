@@ -10,7 +10,7 @@ export default async function Navbar() {
   console.log(session);
 
   return (
-    <div className="flex items-center justify-between px-8 min-h-[8vh] border-b shadow-sm bg-white dark:bg-black z-20">
+    <div className="flex items-center justify-between px-8 min-h-[8vh] border-b shadow-sm bg-white dark:bg-black z-100">
       <div className="">logo</div>
       <div className="flex gap-6 items-center">
         <div className="">

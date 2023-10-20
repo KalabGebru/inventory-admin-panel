@@ -13,10 +13,10 @@ export default async function RootLayout({
     <div className="flex w-full">
       <SideNavbar Admin={session?.user.role === "admin"} session={session} />
       <div className="min-h-screen w-full">
-        <div className="sticky top-0">
+        <div className="sticky top-0 z-50">
           <Navbar />
         </div>
-        <div className="w-full">{children}</div>
+        <div className="w-full z-40">{children}</div>
       </div>
     </div>
   );
