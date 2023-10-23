@@ -36,7 +36,7 @@ export default function EditCat({ cat, func, catId }: Props) {
       <CardContent className="flex p-4 gap-4">
         <div className="flex flex-wrap w-full items-center justify-between">
           {edit ? (
-            <div className="flex items-center justify-between w-full gap-2">
+            <div className="flex flex-wrap items-center justify-between w-full gap-8">
               <div className="flex w-fit items-center gap-2">
                 <div className="w-fit">Amount:</div>
                 <Input
@@ -52,7 +52,7 @@ export default function EditCat({ cat, func, catId }: Props) {
               </Button>
             </div>
           ) : (
-            <div className="flex flex-wrap w-full items-center justify-between">
+            <div className="flex flex-wrap w-full items-center justify-between gap-8">
               <div className="flex gap-2">
                 <span className="bg-gray-400 p-1 rounded">Catagory Name:</span>
                 <div className="text-xl">{` ${value}`}</div>

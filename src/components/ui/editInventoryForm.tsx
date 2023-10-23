@@ -7,6 +7,7 @@ import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { useState } from "react";
 import EditHistory from "./edithistory";
+import { useTodo } from "@/hooks/useContextData";
 
 type Product = {
   image: string;
@@ -39,8 +40,24 @@ export default function EditInventoryForm({
   inventoryId,
   inventory,
 }: Props) {
+  const { setInventory, setInventoryLoading } = useTodo();
   const [history, setHistory] = useState(inventory?.history);
   const router = useRouter();
+
+  function fetchProductdata() {
+    setInventoryLoading(true);
+    fetch("/api/getInventory")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setInventory(data.Inventory);
+        setInventoryLoading(false);
+      })
+      .catch((err) => {
+        setInventoryLoading(undefined);
+        console.log(err);
+      });
+  }
 
   async function onSubmit() {
     console.log(history);
@@ -58,6 +75,7 @@ export default function EditInventoryForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
+      fetchProductdata();
       router.push(`/inventory/`);
     }
   }

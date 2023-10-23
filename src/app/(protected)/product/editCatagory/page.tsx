@@ -1,5 +1,6 @@
+"use client";
 import EditCatagoryForm from "@/components/ui/editCatagoryForm";
-import services from "@/services/connect";
+import { useTodo } from "@/hooks/useContextData";
 
 type Cat = {
   datetime: string;
@@ -8,7 +9,7 @@ type Cat = {
 };
 
 export default async function page() {
-  const catagory = (await services.GetAllCatagorys()) as Cat[];
+  const { catagory } = useTodo();
 
   if (!catagory) return <div className="">no catagories was found</div>;
 

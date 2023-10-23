@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Checkbox } from "./checkbox";
+import { useTodo } from "@/hooks/useContextData";
 
 const FormSchema = z.object({
   first_name: z.string().min(2, {
@@ -79,6 +80,7 @@ export default function AddCustomerForm({
   editMode,
   docId,
 }: Props) {
+  const { setCustomer, setCustomerLoading } = useTodo();
   const [allowed, setAllowed] = useState(false);
   const [max, setMax] = useState(editMode ? defaultValue?.credit.max : 0);
   const [used, setUsed] = useState(editMode ? defaultValue?.credit.used : 0);
@@ -98,6 +100,21 @@ export default function AddCustomerForm({
       discount: defaultValue?.discount.toString(),
     },
   });
+
+  function fetchCustomerdata() {
+    setCustomerLoading(true);
+    fetch("/api/getCustomers")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setCustomer(data.Customers);
+        setCustomerLoading(false);
+      })
+      .catch((err) => {
+        setCustomerLoading(undefined);
+        console.log(err);
+      });
+  }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
@@ -132,6 +149,7 @@ export default function AddCustomerForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
+      fetchCustomerdata();
       router.push(`/customer/`);
     }
   }

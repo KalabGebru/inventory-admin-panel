@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { FiFilter } from "react-icons/fi";
+import { useTodo } from "@/hooks/useContextData";
+import LoadingSpinner from "@/components/ui/loadingSpinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,6 +43,7 @@ export function CustomerDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { customerLoading } = useTodo();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -80,6 +83,13 @@ export function CustomerDataTable<TData, TValue>({
       },
     ]);
   }, [creditFilter]);
+
+  if (customerLoading == undefined)
+    return (
+      <div className="w-full flex justify-center p-24">
+        <span>Error occured while fetching Data</span>
+      </div>
+    );
 
   return (
     <div className="">
@@ -194,7 +204,17 @@ export function CustomerDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {customerLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {/* Loading Data... */}
+                  <LoadingSpinner />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

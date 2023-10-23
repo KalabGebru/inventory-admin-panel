@@ -1,3 +1,4 @@
+"use client";
 import { AddUsers } from "@/components/ui/addUsers";
 
 export default function page() {

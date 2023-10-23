@@ -17,16 +17,7 @@ import { ComboboxProduct } from "./ComboboxProduct";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { Checkbox } from "./checkbox";
-
-type Sales = {
-  customer: string;
-  datetime: string;
-  docId: string;
-  discounted: boolean;
-  totalAmount: number;
-  paidIn: string;
-  items: Items[];
-};
+import { useTodo } from "@/hooks/useContextData";
 
 type Customer = {
   docId: string;
@@ -52,28 +43,17 @@ type Product = {
   product_name: string;
 };
 
-type Inventory = {
-  productId: string;
-  datetime: string;
-  docId: string;
-  currentAmount: number;
-  history: [{ addedAmount: number; datetime: string }];
-};
-
-type Props = {
-  customers: Customer[];
-  product: Product[];
-  inventory: Inventory[];
-};
-
 type Items = {
   productId: string;
   product: Product;
   no: number;
 };
 
-export default function AddSalesForm({ customers, product, inventory }: Props) {
-  const [customer, setCustomer] = useState<Customer | undefined>();
+export default function AddSalesForm() {
+  const { products, customer, setSales, setSalesLoading } = useTodo();
+  const [selectedCustomer, setSelectedCustomer] = useState<
+    Customer | undefined
+  >();
   const [items, setItems] = useState<Items[]>([]);
   const [paidIn, setPaidIn] = useState("cash");
   const [discounted, setDiscounted] = useState(false);
@@ -89,6 +69,21 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
         ))
   );
 
+  function fetchSalesdata() {
+    setSalesLoading(true);
+    fetch("/api/getSales")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setSales(data.Sales);
+        setSalesLoading(false);
+      })
+      .catch((err) => {
+        setSalesLoading(undefined);
+        console.log(err);
+      });
+  }
+
   async function onSubmit() {
     // if (!customer) {
     //   return alert(`you haven't selected customer `);
@@ -97,8 +92,12 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
       return alert(`you haven't selected products`);
     }
 
-    if (customer && paidIn === "credit" && customer.credit.max != 0) {
-      const left = customer.credit.max - customer.credit.used;
+    if (
+      selectedCustomer &&
+      paidIn === "credit" &&
+      selectedCustomer.credit.max != 0
+    ) {
+      const left = selectedCustomer.credit.max - selectedCustomer.credit.used;
       if (Total > left)
         return alert(
           `the customer only has ${left} credits. Maybe use mixed and pay the rest ${
@@ -108,7 +107,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
     }
 
     const senddata = {
-      customer: customer?.docId ? customer?.docId : "XXXX",
+      customer: selectedCustomer?.docId ? selectedCustomer?.docId : "XXXX",
       items: items.map((item) => {
         return { productId: item.productId, no: item.no };
       }),
@@ -127,6 +126,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
       const response = await res.json();
       console.log(response);
       if (response.result.created) {
+        fetchSalesdata();
         router.push(`/sales/`);
       }
     }
@@ -159,39 +159,39 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
       <div className="text-xl mb-8">Add a Sales</div>
       <div className="">
         <div className="mb-2">Customer:</div>
-        <Combobox list={customers} setCustomer={setCustomer} />
+        <Combobox list={customer} setCustomer={setSelectedCustomer} />
       </div>
       <div className="">
         <div className="mb-2">Product:</div>
-        <ComboboxProduct list={product} setItems={setItems} />
+        <ComboboxProduct list={products} setItems={setItems} />
       </div>
 
       <div className="mt-8">
         <div className="mb-4"> Selected Customer:</div>
-        {customer ? (
+        {selectedCustomer ? (
           <div className="flex flex-col gap-4">
             <Card className="w-full max-w-xl">
               <CardContent className="flex flex-col gap-2 p-4">
                 <div className="">
                   <span className="bg-gray-400 p-1 rounded">FirstName:</span>
-                  {` ${customer.first_name}`}
+                  {` ${selectedCustomer.first_name}`}
                 </div>
                 <div className="">
                   <span className="bg-gray-400 p-1 rounded">LastName:</span>
-                  {` ${customer.last_name}`}
+                  {` ${selectedCustomer.last_name}`}
                 </div>
                 <div className="">
                   <span className="bg-gray-400 p-1 rounded">PhoneNumber:</span>
-                  {` ${customer.phone_number}`}
+                  {` ${selectedCustomer.phone_number}`}
                 </div>
                 <div className="">
                   <span className="bg-gray-400 p-1 rounded">Email:</span>
-                  {` ${customer.email}`}
+                  {` ${selectedCustomer.email}`}
                 </div>
-                {customer.credit.allowed && (
+                {selectedCustomer.credit.allowed && (
                   <div className="">
                     <span className="bg-gray-400 p-1 rounded">Credit:</span>
-                    {` ${customer.credit.max}-${customer.credit.used}`}
+                    {` ${selectedCustomer.credit.max}-${selectedCustomer.credit.used}`}
                   </div>
                 )}
               </CardContent>
@@ -199,7 +199,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
             <div className="flex">
               <Button
                 variant="secondary"
-                onClick={() => setCustomer(undefined)}
+                onClick={() => setSelectedCustomer(undefined)}
               >
                 Clear Customer
               </Button>
@@ -265,7 +265,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
         <label htmlFor="Discount">Applay discount</label>
       </div>
 
-      {customer?.credit.allowed ? (
+      {selectedCustomer?.credit.allowed ? (
         <div className="flex items-center gap-4">
           <span>PaidIn:</span>
           <Select

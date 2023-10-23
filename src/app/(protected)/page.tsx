@@ -1,17 +1,16 @@
 "use client";
 
-import services from "@/services/connect";
-import { getServerSession } from "next-auth";
-import { options } from "../api/auth/[...nextauth]/options";
 import ApiCall from "@/components/ui/ApiCall";
 import RenderLineChart from "@/components/ui/lineChart";
 import BarChartData from "@/components/ui/barChart";
 import PieChartData from "@/components/ui/pieChart";
+import { useTodo } from "@/hooks/useContextData";
+import { Button } from "@/components/ui/button";
 
-export default async function Home() {
+export default function Home() {
+  // const { products } = useTodo();
   // const session = await getServerSession(options);
   // const user = await services.EditAllInventory();
-  // console.log(session?.user);
 
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
@@ -19,17 +18,17 @@ export default async function Home() {
         {/* <div className=" text-white text-3xl">{session?.user.role}</div> */}
         {/* <ApiCall /> */}
         {/* <RenderLineChart /> */}
-        <div className="flex flex-wrap gap-4">
-          <div className="w-[600px]">
+        <div className="flex flex-wrap gap-4 box-border">
+          <div className="w-1/2 box-border">
             <BarChartData Labal="Top Product" />
           </div>
-          {/* <div className="w-[600px]">
+          <div className="w-1/2 box-border">
             <BarChartData Labal="Top Customer" />
           </div>
-          <div className="w-[600px]">
+          <div className="w-1/2 box-border">
             <BarChartData Labal="Top Catagory" />
-          </div> */}
-          <div className="w-[600px]">
+          </div>
+          <div className="w-1/2 box-border">
             <PieChartData />
           </div>
         </div>

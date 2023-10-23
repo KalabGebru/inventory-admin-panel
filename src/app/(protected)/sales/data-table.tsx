@@ -34,6 +34,8 @@ import Link from "next/link";
 import { FiFilter } from "react-icons/fi";
 import { BsFilterRight } from "react-icons/bs";
 import { SalseToExcel, downloadToExcel } from "@/lib/xlsx";
+import { useTodo } from "@/hooks/useContextData";
+import LoadingSpinner from "@/components/ui/loadingSpinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,6 +46,7 @@ export function ProductDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { salesLoading } = useTodo();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "datetime", desc: true },
   ]);
@@ -113,6 +116,13 @@ export function ProductDataTable<TData, TValue>({
     setMaxDate(undefined);
     setMinDate(undefined);
   }
+
+  if (salesLoading == undefined)
+    return (
+      <div className="w-full flex justify-center p-24">
+        <span>Error occured while fetching Data</span>
+      </div>
+    );
 
   return (
     <div className="">
@@ -260,22 +270,34 @@ export function ProductDataTable<TData, TValue>({
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+            {salesLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {/* Loading Data... */}
+                  <LoadingSpinner />
+                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (

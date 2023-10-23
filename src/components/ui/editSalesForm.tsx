@@ -17,6 +17,7 @@ import { ComboboxProduct } from "./ComboboxProduct";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { Checkbox } from "./checkbox";
+import { useTodo } from "@/hooks/useContextData";
 
 type Sales = {
   customer: string;
@@ -75,6 +76,7 @@ type Items = {
 };
 
 export default function EditSalesForm({ customers, product, sales }: Props) {
+  const { setSales, setSalesLoading } = useTodo();
   const selectedCustomer = customers.find(
     (c) => c.docId === sales.customer
   ) as Customer;
@@ -107,6 +109,21 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
 
   console.log(Total);
 
+  function fetchSalesdata() {
+    setSalesLoading(true);
+    fetch("/api/getSales")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setSales(data.Sales);
+        setSalesLoading(false);
+      })
+      .catch((err) => {
+        setSalesLoading(undefined);
+        console.log(err);
+      });
+  }
+
   async function onSubmit() {
     if (!customer) {
       return alert(`you haven't selected customer `);
@@ -135,6 +152,7 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
       const response = await res.json();
       console.log(response);
       if (response.result.edited) {
+        fetchSalesdata();
         router.push(`/sales/`);
       }
     }

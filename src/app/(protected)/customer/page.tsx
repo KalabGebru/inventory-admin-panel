@@ -1,16 +1,27 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+"use client";
+
 import CustomerDataTable from "./data-table";
-import services from "@/services/connect";
-import { columns } from "./columns";
+// import { columns } from "./columns";
 import TopCard from "@/components/ui/topCard";
+import { useTodo } from "@/hooks/useContextData";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RiArrowUpDownFill } from "react-icons/Ri";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FiMoreVertical } from "react-icons/fi";
+import Link from "next/link";
 // import { people } from "@/lib/customers";
+
+type credit = { allowed: boolean; max: number; used: number };
 
 type Customer = {
   docId: string;
@@ -24,18 +35,219 @@ type Customer = {
   history: string[];
 };
 
-export default async function Home() {
-  // people.forEach((C) => {
-  //   services.AddCustomer(C);
-  // });
+export default function Customer() {
+  const { customer, setCustomer } = useTodo();
+  console.log(customer);
 
-  // await services.EditAllProducts();
-
-  const custemersData = (await services.GetAllCustomers()) as Customer[];
-
-  if (!custemersData) {
-    return <div className="">can not get any data found</div>;
+  function fetchCustomerdata() {
+    fetch("/api/getCustomers")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setCustomer(data.Customers);
+      })
+      .catch((err) => console.log(err));
   }
+
+  useEffect(() => {
+    console.log("change");
+  }, [customer]);
+
+  async function deleteCustomer(id: string) {
+    console.log(id);
+    const res = await fetch("/api/deleteCustomer", {
+      method: "POST",
+      body: JSON.stringify({ id }),
+    });
+
+    if (res.ok) {
+      const response = await res.json();
+      console.log(response.success);
+      if (response.success) fetchCustomerdata();
+    }
+  }
+
+  const columns: ColumnDef<Customer>[] = [
+    {
+      id: "select",
+      header: ({ table }) => {
+        return (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => {
+              table.toggleAllPageRowsSelected(!!value);
+            }}
+          />
+        );
+      },
+      cell: ({ row }) => {
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => {
+              row.toggleSelected(!!value);
+            }}
+          />
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              column.toggleSorting(column.getIsSorted() === "asc");
+            }}
+            className="pl-0"
+          >
+            First Name
+            <RiArrowUpDownFill size={16} />
+          </Button>
+        );
+      },
+      accessorKey: "first_name",
+    },
+    {
+      header: "Last Name",
+      accessorKey: "last_name",
+    },
+    {
+      header: "Gender",
+      accessorKey: "gender",
+    },
+    {
+      header: "Email",
+      accessorKey: "email",
+    },
+    {
+      header: "Phone Number",
+      accessorKey: "phone_number",
+      cell: ({ row }) => {
+        const formatedPhoneNumber = `+25${row.getValue("phone_number")}`;
+        return <div className="font-medium">{formatedPhoneNumber}</div>;
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              column.toggleSorting(column.getIsSorted() === "asc");
+            }}
+            className="pl-0"
+          >
+            Discount %
+            <RiArrowUpDownFill size={16} />
+          </Button>
+        );
+      },
+      accessorKey: "discount",
+      cell: ({ row }) => {
+        const formatedDiscountPercentail = `${row.getValue("discount")}%`;
+        return <div className="font-medium">{formatedDiscountPercentail}</div>;
+      },
+    },
+    {
+      header: "Credit Allowed",
+      accessorKey: "credit",
+      cell: ({ row }) => {
+        const credit: credit = row.getValue("credit");
+        return credit.allowed ? (
+          <div className="flex w-16 items-center justify-center bg-green-400 font-bold rounded rouned text-green-900">
+            <div className="">True</div>
+          </div>
+        ) : (
+          <div className="flex w-16 items-center justify-center bg-red-400 font-bold rounded text-red-900">
+            <div className="">False</div>
+          </div>
+        );
+      },
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const credit: any = row.getValue(columnId);
+        // value => two date input values
+        console.log(filterStatuses);
+        console.log(credit);
+        //If one filter defined and date is null filter it
+        if (filterStatuses.includes(credit.allowed)) return true;
+        else return false;
+      },
+    },
+    {
+      header: "Credit used",
+      accessorKey: "credit",
+      cell: ({ row }) => {
+        const credit: credit = row.getValue("credit");
+        return (
+          <div className="font-medium">
+            {credit.allowed ? credit.used : null}
+          </div>
+        );
+      },
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const credit: any = row.getValue(columnId);
+        // value => two date input values
+        console.log(filterStatuses);
+        console.log(credit);
+        //If one filter defined and date is null filter it
+        if (filterStatuses.includes(credit.allowed)) return true;
+        else return false;
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const rowdata = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <FiMoreVertical size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigator.clipboard.writeText(rowdata.phone_number)
+                }
+              >
+                Copy Phone Number
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(rowdata.email)}
+              >
+                Copy Email
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="bg-blue-400 text-white mt-2">
+                <Link href={`customer/editCustomer/${rowdata.docId}`}>
+                  Edit Details
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="bg-red-400 text-white mt-2"
+                onClick={() => deleteCustomer(rowdata.docId)}
+              >
+                Delete Customer
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+  // await services.EditAllProducts();
 
   return (
     <main className="flex flex-col h-full w-full p-12 gap-8">
@@ -65,7 +277,7 @@ export default async function Home() {
       <div className="">
         <CustomerDataTable
           columns={columns}
-          data={custemersData ? custemersData : []}
+          data={customer}
           // data={people}
         />
       </div>

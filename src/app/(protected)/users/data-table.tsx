@@ -30,6 +30,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import LoadingSpinner from "@/components/ui/loadingSpinner";
+import { useTodo } from "@/hooks/useContextData";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,6 +42,7 @@ export function UserDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { usersLoading } = useTodo();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "datetime", desc: true },
   ]);
@@ -69,6 +72,13 @@ export function UserDataTable<TData, TValue>({
       rowSelection,
     },
   });
+
+  if (usersLoading == undefined)
+    return (
+      <div className="w-full flex justify-center p-24">
+        <span>Error occured while fetching Data</span>
+      </div>
+    );
 
   return (
     <div className="">
@@ -142,7 +152,17 @@ export function UserDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {usersLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {/* Loading Data... */}
+                  <LoadingSpinner />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

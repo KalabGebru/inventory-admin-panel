@@ -1,5 +1,6 @@
+"use client";
 import CreateInventoryForm from "@/components/ui/createInventoryForm";
-import services from "@/services/connect";
+import { useTodo } from "@/hooks/useContextData";
 
 type Product = {
   image: string;
@@ -13,10 +14,10 @@ type Product = {
   product_name: string;
 };
 export default async function page() {
-  const productData = (await services.GetAllProducts()) as Product[];
+  const { products } = useTodo();
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <CreateInventoryForm product={productData} />
+      <CreateInventoryForm product={products} />
     </div>
   );
 }

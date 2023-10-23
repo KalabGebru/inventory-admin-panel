@@ -1,5 +1,6 @@
+"use client";
 import AddProductForm from "@/components/ui/addProductForm";
-import services from "@/services/connect";
+import { useTodo } from "@/hooks/useContextData";
 
 type Product = {
   image: string;
@@ -20,15 +21,19 @@ type Props = {
 };
 export default async function page({ params }: Props) {
   console.log(params.productId);
-  const userData = (await services.GetProductById(params.productId)) as Product;
-  console.log(userData);
+  const { products } = useTodo();
 
-  if (!userData) return null;
+  const productData = products.find(
+    (p: Product) => p.docId == params.productId
+  );
+  console.log(productData);
+
+  if (!productData) return null;
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
       <AddProductForm
         editMode={true}
-        defaultValue={userData}
+        defaultValue={productData}
         docId={params.productId}
       />
     </div>

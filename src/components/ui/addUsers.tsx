@@ -28,6 +28,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "./card";
+import { useTodo } from "@/hooks/useContextData";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -45,12 +46,28 @@ const FormSchema = z.object({
 });
 
 export function AddUsers() {
+  const { setUsers, setUsersLoading } = useTodo();
   const [hidePassword, setHidePassword] = useState(true);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
+
+  function fetchUsersdata() {
+    setUsersLoading(true);
+    fetch("/api/getUsers")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setUsers(data.Users);
+        setUsersLoading(false);
+      })
+      .catch((err) => {
+        setUsersLoading(false);
+        console.log(err);
+      });
+  }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
@@ -84,6 +101,7 @@ export function AddUsers() {
       if (res.ok) {
         const response = await res.json();
         console.log(response.result);
+        fetchUsersdata();
         router.push(`/users/`);
       }
     } catch (error) {

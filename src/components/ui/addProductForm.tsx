@@ -28,6 +28,7 @@ import { Textarea } from "./textarea";
 import { useEffect, useState } from "react";
 import UploadImageToStorage from "./UploadImg";
 import Image from "next/image";
+import { useTodo } from "@/hooks/useContextData";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -80,10 +81,26 @@ export default function AddProductForm({
   docId,
 }: Props) {
   // const [file, setfile] = useState<File>();
+  const { setProducts, setProductsLoading } = useTodo();
   const [catagorys, setCatagorys] = useState([]);
   const [image, setImage] = useState(
     editMode ? { image: defaultValue?.image } : { image: "" }
   );
+
+  function fetchProductdata() {
+    setProductsLoading(true);
+    fetch("/api/getProducts")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setProducts(data.Products);
+        setProductsLoading(false);
+      })
+      .catch((err) => {
+        setProductsLoading(undefined);
+        console.log(err);
+      });
+  }
 
   const router = useRouter();
   const formData = new FormData();
@@ -145,6 +162,7 @@ export default function AddProductForm({
       if (response.alreadyExist) {
         alert(`a product with ${data.id} already exists`);
       } else {
+        fetchProductdata();
         router.push(`/product/`);
       }
     }

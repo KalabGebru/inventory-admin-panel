@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EditUsers } from "@/components/ui/editUsers";
+import { useTodo } from "@/hooks/useContextData";
 import services from "@/services/connect";
 
 type User = {
@@ -19,7 +20,10 @@ type Props = {
 
 export default async function page({ params }: Props) {
   console.log(params.userId);
-  const userData = (await services.GetUserById(params.userId)) as User;
+  const { users } = useTodo();
+
+  const userData = users.find((u: User) => u.docId == params.userId);
+
   if (!userData) return null;
   const user = {
     role: userData.role,

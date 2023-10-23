@@ -157,6 +157,25 @@ const services = {
       return undefined;
     }
   },
+  AddCatagory: async (Catagory) => {
+    const productsref = collection(db, "Catagorys");
+
+    try {
+      const data = await addDoc(productsref, { ...Catagory });
+      const createdref = doc(db, "Catagorys", data.id);
+      await setDoc(
+        createdref,
+        {
+          docId: data.id,
+        },
+        { merge: true }
+      );
+      return data.id;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
   EditProduct: async (product, productId) => {
     const createdref = doc(db, "Products", productId);
     try {
@@ -233,6 +252,23 @@ const services = {
         salesref,
         {
           ...newsales,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  EditCatagory: async (id, catagoryName) => {
+    const salesref = doc(db, "Catagorys", id);
+
+    try {
+      await setDoc(
+        salesref,
+        {
+          catagoryName: catagoryName,
         },
         { merge: true }
       );
@@ -341,18 +377,9 @@ const services = {
   },
   DeleteProduct: async (Id) => {
     const productref = doc(db, "Products", Id);
+    console.log(Id);
     try {
       await deleteDoc(productref);
-      return true;
-    } catch (err) {
-      console.log(err);
-      return "something went wrong";
-    }
-  },
-  DeleteProduct: async (Id) => {
-    const userref = doc(db, "Users", Id);
-    try {
-      await deleteDoc(userref);
       return true;
     } catch (err) {
       console.log(err);

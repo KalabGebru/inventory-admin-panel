@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
+import { useTodo } from "@/hooks/useContextData";
 
 type Product = {
   image: string;
@@ -54,11 +55,27 @@ export default function AddInventoryForm({
   inventoryId,
   inventory,
 }: Props) {
+  const { setInventory, setInventoryLoading } = useTodo();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
+
+  function fetchProductdata() {
+    setInventoryLoading(true);
+    fetch("/api/getInventory")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setInventory(data.Inventory);
+        setInventoryLoading(false);
+      })
+      .catch((err) => {
+        setInventoryLoading(undefined);
+        console.log(err);
+      });
+  }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
@@ -75,6 +92,7 @@ export default function AddInventoryForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
+      fetchProductdata();
       router.push(`/inventory/`);
     }
   }

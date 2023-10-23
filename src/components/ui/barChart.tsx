@@ -70,6 +70,30 @@ type Props = {
   Labal: "Top Product" | "Top Catagory" | "Top Customer";
 };
 
+function getMonday(d: Date) {
+  d = new Date(d);
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff)).toISOString();
+  // .slice(0, 10);
+}
+
+function getFirstDayOfTheMonth(d: Date) {
+  let date_today = new Date(d);
+  let firstDay = new Date(
+    date_today.getFullYear(),
+    date_today.getMonth(),
+    1
+  ).toISOString();
+  return firstDay;
+}
+
+function getFirstDayOfTheYear(d: Date) {
+  let date_today = new Date(d);
+  let firstyear = new Date(date_today.getFullYear(), 0, 1).toISOString();
+  return firstyear;
+}
+
 export default function BarChartData({ Labal }: Props) {
   const [data, setData] = useState();
   const [filterDate, setFilterDate] = useState("thisMonth");
@@ -89,13 +113,13 @@ export default function BarChartData({ Labal }: Props) {
     const Data =
       filterDate == "thisWeek"
         ? {
-            min: "2023-10-15",
+            min: getMonday(new Date()),
             max: nowPlusone,
             No: 5,
           }
         : filterDate == "thisMonth"
-        ? { min: "2023-10-01", max: nowPlusone, No: 5 }
-        : { min: "2023-01-01", max: nowPlusone, No: 5 };
+        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: 5 }
+        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: 5 };
     console.log(path);
 
     const res = fetch(`/api/${path}`, {

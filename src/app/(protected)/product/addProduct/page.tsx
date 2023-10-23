@@ -1,3 +1,4 @@
+"use client";
 import AddProductForm from "@/components/ui/addProductForm";
 
 export default function page() {

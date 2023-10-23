@@ -27,6 +27,7 @@ import {
 } from "./select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTodo } from "@/hooks/useContextData";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -53,6 +54,7 @@ type Props = {
 };
 
 export function EditUsers({ user }: Props) {
+  const { setUsers, setUsersLoading } = useTodo();
   const [changePassword, setChangePassword] = useState(false);
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [hideCurrentPassword, setHideCurrentPassword] = useState(true);
@@ -69,6 +71,21 @@ export function EditUsers({ user }: Props) {
       email: user.email,
     },
   });
+
+  function fetchUsersdata() {
+    setUsersLoading(true);
+    fetch("/api/getUsers")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setUsers(data.Users);
+        setUsersLoading(false);
+      })
+      .catch((err) => {
+        setUsersLoading(undefined);
+        console.log(err);
+      });
+  }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
@@ -129,6 +146,7 @@ export function EditUsers({ user }: Props) {
           alert("Current Password Doesn't match");
         }
         if (response.updated) {
+          fetchUsersdata();
           router.push(`/users/`);
         }
       }

@@ -1,5 +1,6 @@
+"use client";
 import AddCustomerForm from "@/components/ui/addCustomerForm";
-import services from "@/services/connect";
+import { useTodo } from "@/hooks/useContextData";
 
 type Customer = {
   docId: string;
@@ -20,9 +21,10 @@ type Props = {
 };
 export default async function page({ params }: Props) {
   console.log(params.customerId);
-  const userData = (await services.GetCustomerById(
-    params.customerId
-  )) as Customer;
+  const { customer } = useTodo();
+
+  const userData = customer.find((c: Customer) => c.docId == params.customerId);
+
   console.log(userData);
 
   if (!userData) return null;

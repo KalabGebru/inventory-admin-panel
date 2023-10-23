@@ -33,6 +33,8 @@ import {
 import Link from "next/link";
 import { FiFilter } from "react-icons/fi";
 import { BsFilterRight } from "react-icons/bs";
+import { useTodo } from "@/hooks/useContextData";
+import LoadingSpinner from "@/components/ui/loadingSpinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -50,6 +52,8 @@ export function ProductDataTable<TData, TValue>({
   data,
   catagory,
 }: DataTableProps<TData, TValue>) {
+  const { productsLoading, catagoryLoading } = useTodo();
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: "datetime", desc: true },
   ]);
@@ -120,9 +124,29 @@ export function ProductDataTable<TData, TValue>({
 
   console.log(catagory);
 
+  console.log(productsLoading);
+  if (productsLoading == undefined)
+    return (
+      <div className="w-full flex justify-center p-24">
+        <span>Error occured while fetching Data</span>
+      </div>
+    );
+
   return (
     <div className="">
       {/* input */}
+      <div className="flex items-center gap-8">
+        <div className="">
+          <Button variant="secondary" asChild>
+            <Link href="/product/addCatagory">add Catagory</Link>
+          </Button>
+        </div>
+        <div className="">
+          <Button variant="secondary" asChild>
+            <Link href="/product/editCatagory">Edit Catagory</Link>
+          </Button>
+        </div>
+      </div>
       <div className="flex items-center justify-between my-4">
         <div className="flex items-center gap-8">
           <Input
@@ -144,29 +168,41 @@ export function ProductDataTable<TData, TValue>({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {catagory.map((cat: ctype) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={cat.docId}
-                    className="capitalize"
-                    checked={catagoryFilter.includes(cat.catagoryName)}
-                    onCheckedChange={(value) => {
-                      const arr = catagoryFilter;
-                      if (value) {
-                        //checking weather array contain the id
-                        arr.push(cat.catagoryName); //adding to array because value doesnt exists
-                      } else {
-                        arr.splice(arr.indexOf(cat.catagoryName), 1); //deleting
-                      }
-                      console.log(arr);
-                      setCatagoryFilter([...arr]);
-                      console.log(catagoryFilter);
-                    }}
+              {catagoryLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
                   >
-                    {cat.catagoryName}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
+                    {/* Loading Data... */}
+                    <LoadingSpinner />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                catagory.map((cat: ctype) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={cat.docId}
+                      className="capitalize"
+                      checked={catagoryFilter.includes(cat.catagoryName)}
+                      onCheckedChange={(value) => {
+                        const arr = catagoryFilter;
+                        if (value) {
+                          //checking weather array contain the id
+                          arr.push(cat.catagoryName); //adding to array because value doesnt exists
+                        } else {
+                          arr.splice(arr.indexOf(cat.catagoryName), 1); //deleting
+                        }
+                        console.log(arr);
+                        setCatagoryFilter([...arr]);
+                        console.log(catagoryFilter);
+                      }}
+                    >
+                      {cat.catagoryName}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="flex min-w-fit gap-8">
@@ -216,11 +252,6 @@ export function ProductDataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-8">
-          <div className="">
-            <Button variant="secondary" asChild>
-              <Link href="/product/editCatagory">Edit Catagory</Link>
-            </Button>
-          </div>
           <div className="">
             <Button asChild>
               <Link href="/product/addProduct">Add Product</Link>
@@ -277,7 +308,17 @@ export function ProductDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {productsLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {/* Loading Data... */}
+                  <LoadingSpinner />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

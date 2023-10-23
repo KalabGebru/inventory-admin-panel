@@ -1,4 +1,5 @@
 import EditInventoryForm from "@/components/ui/editInventoryForm";
+import { useTodo } from "@/hooks/useContextData";
 import services from "@/services/connect";
 
 type Inventory = {
@@ -28,24 +29,27 @@ type Props = {
 };
 export default async function page({ params }: Props) {
   console.log(params.inventoryId);
-  const inventory = (await services.GetInventoryById(
-    params.inventoryId
-  )) as Inventory;
-  if (!inventory) return <div className="">no Inventory by that ID</div>;
-  const product = (await services.GetProductById(
-    inventory.productId
-  )) as Product;
-  console.log(product);
+  const { inventory, products } = useTodo();
 
-  if (!product) return <div className="">no product by that ID</div>;
+  const inventoryData = inventory.find(
+    (i: Inventory) => i.docId == params.inventoryId
+  );
+
+  if (!inventoryData) return <div className="">no Inventory by that ID</div>;
+
+  const productData = products.find(
+    (p: Product) => p.docId == inventoryData.docId
+  );
+
+  if (!productData) return <div className="">no product by that ID</div>;
 
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
       <div className="w-full max-w-3xl border-2 rounded-lg">
         <EditInventoryForm
-          product={product}
+          product={productData}
           inventoryId={params.inventoryId}
-          inventory={inventory}
+          inventory={inventoryData}
         />
       </div>
     </div>
