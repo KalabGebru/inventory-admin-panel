@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 type Props = {
-  no: string;
+  no: number;
   Labal: string;
 };
 export default function InvCard({ no, Labal }: Props) {

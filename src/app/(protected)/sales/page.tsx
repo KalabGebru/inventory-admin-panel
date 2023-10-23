@@ -58,14 +58,18 @@ export default async function Home() {
 
   const salesViewData = salesData.map((s) => {
     const productD = productData.filter(
-      (p) =>
-        p.docId === s.items[0].productId || p.docId === s.items[1].productId
+      (p) => {
+        return s.items.find((item) => {
+          return p.docId === item.productId;
+        });
+      }
+      // p.docId === s.items[0].productId || p.docId === s.items[1].productId
     );
     const customerD = customersData.filter((c) => c.docId === s.customer)[0];
 
     const detailsP = {
       productsD: productD,
-      customerD: customerD,
+      customerD: customerD ? customerD : "XXXX",
     };
 
     return {

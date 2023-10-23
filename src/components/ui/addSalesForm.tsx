@@ -90,14 +90,14 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
   );
 
   async function onSubmit() {
-    if (!customer) {
-      return alert(`you haven't selected customer `);
-    }
+    // if (!customer) {
+    //   return alert(`you haven't selected customer `);
+    // }
     if (items.length == 0) {
       return alert(`you haven't selected products`);
     }
 
-    if (paidIn === "credit" && customer.credit.max != 0) {
+    if (customer && paidIn === "credit" && customer.credit.max != 0) {
       const left = customer.credit.max - customer.credit.used;
       if (Total > left)
         return alert(
@@ -108,7 +108,7 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
     }
 
     const senddata = {
-      customer: customer?.docId,
+      customer: customer?.docId ? customer?.docId : "XXXX",
       items: items.map((item) => {
         return { productId: item.productId, no: item.no };
       }),
@@ -118,18 +118,18 @@ export default function AddSalesForm({ customers, product, inventory }: Props) {
     };
     console.log(senddata);
 
-    // const res = await fetch("/api/addSales", {
-    //   method: "POST",
-    //   body: JSON.stringify(senddata),
-    // });
+    const res = await fetch("/api/addSales", {
+      method: "POST",
+      body: JSON.stringify(senddata),
+    });
 
-    // if (res.ok) {
-    //   const response = await res.json();
-    //   console.log(response);
-    //   if (response.created) {
-    //     router.push(`/sales/`);
-    //   }
-    // }
+    if (res.ok) {
+      const response = await res.json();
+      console.log(response);
+      if (response.result.created) {
+        router.push(`/sales/`);
+      }
+    }
   }
 
   function subtruct(id: string) {

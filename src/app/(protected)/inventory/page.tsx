@@ -39,7 +39,7 @@ export default async function Home() {
 
   const inventoryData = (await services.GetAllInventorys()) as Inventory[];
   const productData = (await services.GetAllProducts()) as Product[];
-  const catagoryData = await services.GetAllCatagory();
+  const catagoryData = await services.GetAllCatagorys();
 
   const inventoryViewData = inventoryData.map((inv) => {
     const productD = productData.filter((p) => p.docId === inv.productId)[0];

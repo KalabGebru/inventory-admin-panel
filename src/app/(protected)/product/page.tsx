@@ -27,7 +27,7 @@ type Product = {
 export default async function Home() {
   // const ed = await services.Ed(Data);
 
-  const catagoryData = await services.GetAllCatagory();
+  const catagoryData = await services.GetAllCatagorys();
   const productData = (await services.GetAllProducts()) as Product[];
 
   if (!productData) {

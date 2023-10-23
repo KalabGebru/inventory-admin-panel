@@ -4,7 +4,7 @@ export const POST = async (request) => {
   const { min, max } = await request.json();
 
   try {
-    console.log(min, max, No);
+    console.log(min, max);
 
     const salesData = await services.GetAllSeles();
 
@@ -28,71 +28,42 @@ export const POST = async (request) => {
 
     // make the sale by unregistered customer customer:"XXX" first
 
+    const customersObject = {};
+
     filteredSales.forEach((sale) => {
+      const cu =
+        sale.customer == "XXXX"
+          ? "Unregistered Customers"
+          : "Registered Customers";
       const items = sale.items;
       items.forEach((item) => {
-        const no = customersObject[sale.customer]
-          ? customersObject[sale.customer].no + item.no
+        const no = customersObject[cu]
+          ? customersObject[cu].no + item.no
           : item.no;
-        customersObject[sale.customer] = {
-          customerId: sale.customer,
+        customersObject[cu] = {
+          ...customersObject[cu],
+          customerType: cu,
           no: no,
         };
       });
-      customersObject[sale.customer] = {
-        ...customersObject[sale.customer],
-        price: customersObject[sale.customer].price
-          ? customersObject[sale.customer] + sale.totalAmount
+      customersObject[cu] = {
+        ...customersObject[cu],
+        price: customersObject[cu].price
+          ? customersObject[cu].price + sale.totalAmount
           : sale.totalAmount,
       };
     });
 
     console.log(customersObject);
 
-    const Customer = Object.values(customersObject).map((pro) => {
-      return {
-        ...pro,
-        ...customerName[pro.customerId],
-      };
-    });
+    const Customer = Object.values(customersObject);
 
     console.log(Customer);
-
-    const TopByNo = Array.from({ length: No }, () => {
-      return { price: 0, no: 0 };
-    });
-    const TopByPrice = Array.from({ length: No }, () => {
-      return { price: 0, no: 0 };
-    });
-
-    Customer.forEach((pro) => {
-      for (let i = 0; i < TopByNo.length; i++) {
-        if (pro.no >= TopByNo[i].no) {
-          TopByNo.splice(i, 0, pro);
-          TopByNo.pop();
-          break;
-        }
-      }
-    });
-
-    Customer.forEach((pro) => {
-      for (let i = 0; i < TopByPrice.length; i++) {
-        if (pro.price >= TopByPrice[i].price) {
-          TopByPrice.splice(i, 0, pro);
-          TopByPrice.pop();
-          break;
-        }
-      }
-    });
-
-    console.log(TopByNo);
-    console.log(TopByPrice);
 
     return new Response(
       JSON.stringify({
         result: {
-          topByNo: TopByNo,
-          topByPrice: TopByPrice,
+          Customer: Customer,
         },
       }),
       {

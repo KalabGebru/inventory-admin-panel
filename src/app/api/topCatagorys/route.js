@@ -94,8 +94,8 @@ export const POST = async (request) => {
     return new Response(
       JSON.stringify({
         result: {
-          topByNo: TopByNo,
-          topByPrice: TopByPrice,
+          topByNo: TopByNo.filter((p) => p.catagory),
+          topByPrice: TopByPrice.filter((p) => p.catagory),
         },
       }),
       {

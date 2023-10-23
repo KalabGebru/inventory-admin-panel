@@ -15,6 +15,7 @@ import { RiArrowUpDownFill } from "react-icons/Ri";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { string } from "zod";
 // import { Product } from "@/lib/products";
 
 type Customer = {
@@ -48,7 +49,7 @@ type Items = {
 
 type SalesViewData = {
   productsD: Product[];
-  customerD: Customer;
+  customerD: Customer | string;
   customer: string;
   productId: string;
   datetime: string;
@@ -128,7 +129,11 @@ export const columns: ColumnDef<SalesViewData>[] = [
     accessorKey: "customerD",
     cell: ({ row }) => {
       const customer: Customer = row.getValue("customerD");
-      return <div className="">{customer.first_name}</div>;
+      return (
+        <div className="">
+          {customer?.first_name ? customer?.first_name : "XXXX"}
+        </div>
+      );
     },
     filterFn: (row, columnId, filterStatuses) => {
       if (!filterStatuses) return true;
@@ -136,7 +141,8 @@ export const columns: ColumnDef<SalesViewData>[] = [
       // value => two date input values
       //If one filter defined and date is null filter it
       let allCharactersExist = true;
-      let name = customer.first_name.toLowerCase();
+      const text = customer.first_name ? customer.first_name : customer;
+      let name = text.toString().toLowerCase();
       for (let i = 0; i < filterStatuses.length; i++) {
         const caracter = filterStatuses[i].toLowerCase();
         if (!name.includes(caracter)) {
@@ -242,7 +248,11 @@ export const columns: ColumnDef<SalesViewData>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const rowdata = row.original;
-
+      const name =
+        typeof rowdata.customerD == "object"
+          ? rowdata.customerD.first_name
+          : "XXXX";
+      console.log(name);
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -254,9 +264,7 @@ export const columns: ColumnDef<SalesViewData>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(rowdata.customerD.first_name)
-              }
+              onClick={() => navigator.clipboard.writeText(name)}
             >
               Copy Customer Name
             </DropdownMenuItem>

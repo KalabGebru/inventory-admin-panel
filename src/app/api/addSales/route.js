@@ -38,6 +38,7 @@ export const POST = async (request) => {
       const good = await services.SubInventory(inv.docId, currentAmount);
       if (!good) err.push(items[i].productId);
     }
+    console.log(totalAmount);
 
     const newSales = {
       customer: customer,
@@ -48,8 +49,28 @@ export const POST = async (request) => {
       datetime: new Date().toISOString(),
     };
 
-    const created = services.AddSales(newSales);
-    const addedToCustomer = services.AddSalesToCustomer(customer, created);
+    const created = await services.AddSales(newSales);
+    console.log(created);
+    let addedToCustomer;
+    if (created && customer != "XXXX") {
+      const cu = await services.GetCustomerById(customer);
+      let cuData;
+      const history = cu.history;
+      console.log(history);
+      if (paidIn == "credit") {
+        const used = cu.credit.used + totalAmount;
+        cuData = {
+          history: [...history, created],
+          credit: { ...cu.credit, used: used },
+        };
+      } else {
+        cuData = {
+          history: [...history, created],
+        };
+      }
+      addedToCustomer = await services.AddSalesToCustomer(customer, cuData);
+      console.log(cuData);
+    }
 
     return new Response(
       JSON.stringify({

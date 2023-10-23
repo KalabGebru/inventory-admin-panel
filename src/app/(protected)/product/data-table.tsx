@@ -217,6 +217,11 @@ export function ProductDataTable<TData, TValue>({
 
         <div className="flex items-center gap-8">
           <div className="">
+            <Button variant="secondary" asChild>
+              <Link href="/product/editCatagory">Edit Catagory</Link>
+            </Button>
+          </div>
+          <div className="">
             <Button asChild>
               <Link href="/product/addProduct">Add Product</Link>
             </Button>

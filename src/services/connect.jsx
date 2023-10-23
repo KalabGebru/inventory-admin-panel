@@ -114,24 +114,24 @@ const services = {
         },
         { merge: true }
       );
-      if (Sales.paidIn == "credit") {
-        const createdref = doc(db, "Customer", Sales.customer);
+      // if (Sales.paidIn == "credit") {
+      //   const createdref = doc(db, "Customer", Sales.customer);
 
-        const product = await getDoc(customersref);
+      //   const product = await getDoc(customersref);
 
-        const custmerdata = product.data();
+      //   const custmerdata = product.data();
 
-        await setDoc(
-          createdref,
-          {
-            credit: {
-              ...custmerdata.credit,
-              used: custmerdata.credit.used + Number(Sales.totalAmount),
-            },
-          },
-          { merge: true }
-        );
-      }
+      //   await setDoc(
+      //     createdref,
+      //     {
+      //       credit: {
+      //         ...custmerdata.credit,
+      //         used: custmerdata.credit.used + Number(Sales.totalAmount),
+      //       },
+      //     },
+      //     { merge: true }
+      //   );
+      // }
       return data.id;
     } catch (err) {
       console.log(err);
@@ -277,12 +277,15 @@ const services = {
     }
   },
   GetAllCatagorys: async () => {
+    console.log("g");
     const catagorysref = collection(db, "Catagorys");
     try {
       const data = await getDocs(catagorysref);
+      console.log("g");
       const allcatagorys = data.docs.map((doc) => doc.data());
       return allcatagorys;
     } catch (err) {
+      console.log(err);
       return undefined;
     }
   },
@@ -312,16 +315,6 @@ const services = {
       const data = await getDocs(inventorysref);
       const allinventorys = data.docs.map((doc) => doc.data());
       return allinventorys;
-    } catch (err) {
-      return undefined;
-    }
-  },
-  GetAllCatagory: async () => {
-    const catagorysref = collection(db, "Catagorys");
-    try {
-      const data = await getDocs(catagorysref);
-      const allcatagorys = data.docs.map((doc) => doc.data());
-      return allcatagorys;
     } catch (err) {
       return undefined;
     }
@@ -379,6 +372,16 @@ const services = {
         },
         { merge: true }
       );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
+  DeleteSales: async (Id) => {
+    const salesref = doc(db, "Sales", Id);
+    try {
+      await deleteDoc(salesref);
       return true;
     } catch (err) {
       console.log(err);
@@ -508,16 +511,17 @@ const services = {
       return undefined;
     }
   },
-  AddSalesToCustomer: async (customerId, salesId) => {
+  AddSalesToCustomer: async (customerId, cuData) => {
     const customersref = doc(db, "Customers", customerId);
 
     try {
       await setDoc(
         customersref,
         {
-          history: arrayUnion(
-            ...[{ salesId: salesId, datetime: new Date().toISOString() }]
-          ),
+          // history: arrayUnion(
+          //   ...[{ salesId: salesId, datetime: new Date().toISOString() }]
+          // ),
+          ...cuData,
         },
         { merge: true }
       );

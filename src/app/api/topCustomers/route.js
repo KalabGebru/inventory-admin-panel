@@ -48,6 +48,7 @@ export const POST = async (request) => {
           ? customersObject[sale.customer].no + item.no
           : item.no;
         customersObject[sale.customer] = {
+          ...customersObject[sale.customer],
           customerId: sale.customer,
           no: no,
         };
@@ -55,7 +56,7 @@ export const POST = async (request) => {
       customersObject[sale.customer] = {
         ...customersObject[sale.customer],
         price: customersObject[sale.customer].price
-          ? customersObject[sale.customer] + sale.totalAmount
+          ? customersObject[sale.customer].price + sale.totalAmount
           : sale.totalAmount,
       };
     });
@@ -100,12 +101,11 @@ export const POST = async (request) => {
 
     console.log(TopByNo);
     console.log(TopByPrice);
-
     return new Response(
       JSON.stringify({
         result: {
-          topByNo: TopByNo,
-          topByPrice: TopByPrice,
+          topByNo: TopByNo.filter((p) => p.customerId),
+          topByPrice: TopByPrice.filter((p) => p.customerId),
         },
       }),
       {

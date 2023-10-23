@@ -11,7 +11,16 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ComposedChart,
 } from "recharts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 
 // const data = [
 //   {
@@ -57,18 +66,39 @@ import {
 //     amt: 2100,
 //   },
 // ];
+type Props = {
+  Labal: "Top Product" | "Top Catagory" | "Top Customer";
+};
 
-export default function BarChartData() {
+export default function BarChartData({ Labal }: Props) {
   const [data, setData] = useState();
+  const [filterDate, setFilterDate] = useState("thisMonth");
 
   useEffect(() => {
-    const Data = {
-      min: "2023-10-10",
-      max: "2023-10-17",
-      No: 5,
-    };
+    const path =
+      Labal == "Top Catagory"
+        ? "topCatagorys"
+        : Labal == "Top Product"
+        ? "topProducts"
+        : "topCustomers";
 
-    const res = fetch(`/api/topProducts`, {
+    const now = new Date();
+    now.setDate(now.getDate() + 1);
+    const nowPlusone = now.toISOString().slice(0, 10);
+    console.log(nowPlusone, now);
+    const Data =
+      filterDate == "thisWeek"
+        ? {
+            min: "2023-10-15",
+            max: nowPlusone,
+            No: 5,
+          }
+        : filterDate == "thisMonth"
+        ? { min: "2023-10-01", max: nowPlusone, No: 5 }
+        : { min: "2023-01-01", max: nowPlusone, No: 5 };
+    console.log(path);
+
+    const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
     })
@@ -77,40 +107,129 @@ export default function BarChartData() {
         console.log(data);
         setData(data);
       });
-  }, []);
+  }, [filterDate]);
 
   if (!data) return null;
 
   const dd = data.result.topByNo;
+  const ddd = data.result.topByPrice;
+  const keyY =
+    Labal == "Top Catagory"
+      ? "catagory"
+      : Labal == "Top Product"
+      ? "product_name"
+      : "first_name";
+  console.log(keyY);
 
+  const tickFormatter = (value: string, index: number) => {
+    const limit = 15; // put your maximum character
+    if (value.length < limit) return value;
+    return `${value.substring(0, limit)}...`;
+  };
   return (
-    <BarChart
-      //   layout="vertical"
-      width={500}
-      height={300}
-      data={dd}
-      margin={{
-        top: 5,
-        right: 30,
-        left: 20,
-        bottom: 5,
-      }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Bar
-        dataKey="no"
-        fill="#1e1ecf"
-        activeBar={<Rectangle fill="pink" stroke="blue" />}
-      />
-      {/* <Bar
-        dataKey="price"
-        fill="#82ca9d"
-        activeBar={<Rectangle fill="gold" stroke="purple" />}
-      /> */}
-    </BarChart>
+    <div className="border rounded-lg p-4">
+      <h1 className={`text-xl rounded-md py-1 px-2 mb-2`}>{Labal}</h1>
+      <Tabs defaultValue="byNo" className="">
+        <div className="flex items-center justify-between gap-8 mb-8">
+          <Select
+            onValueChange={(value) => setFilterDate(value)}
+            defaultValue={filterDate}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="thisWeek">This Week</SelectItem>
+              <SelectItem value="thisMonth">This Month</SelectItem>
+              <SelectItem value="thisYear">This year</SelectItem>
+            </SelectContent>
+          </Select>
+          <TabsList className="grid grid-cols-2 w-40">
+            <TabsTrigger value="byNo">By No</TabsTrigger>
+            <TabsTrigger value="byPrice">By Price</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="byNo">
+          <div className="w-full aspect-video">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                className=""
+                layout="vertical"
+                width={500}
+                height={400}
+                data={dd}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  bottom: 20,
+                  left: 20,
+                }}
+              >
+                <CartesianGrid stroke="#f5f5f5" />
+                <XAxis
+                  height={50}
+                  type="number"
+                  label={{
+                    value: "No of Products",
+                    angle: 0,
+                    position: "insideBottom",
+                  }}
+                />
+                <YAxis
+                  width={70}
+                  tickFormatter={tickFormatter}
+                  dataKey={keyY}
+                  type="category"
+                  scale="band"
+                />
+                <Tooltip />
+                {/* <Legend /> */}
+                <Bar dataKey="no" barSize={20} fill="#413ea0" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </TabsContent>
+        <TabsContent value="byPrice">
+          <div className="w-full aspect-video">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                className=""
+                layout="vertical"
+                width={500}
+                height={400}
+                data={ddd}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  bottom: 20,
+                  left: 20,
+                }}
+              >
+                <CartesianGrid stroke="#f5f5f5" />
+                <XAxis
+                  height={50}
+                  type="number"
+                  label={{
+                    value: "Price of Products",
+                    angle: 0,
+                    position: "insideBottom",
+                  }}
+                />
+                <YAxis
+                  width={70}
+                  tickFormatter={tickFormatter}
+                  dataKey={keyY}
+                  type="category"
+                  scale="band"
+                />
+                <Tooltip />
+                {/* <Legend /> */}
+                <Bar dataKey="price" barSize={20} fill="#413ea0" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
