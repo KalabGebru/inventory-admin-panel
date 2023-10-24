@@ -252,27 +252,9 @@ export default function Customer() {
   return (
     <main className="flex flex-col h-full w-full p-12 gap-8">
       <div className="flex gap-8">
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topCustomers"
-          timeLabel="This Week"
-        />
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topCustomers"
-          timeLabel="This Week"
-        />
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topCustomers"
-          timeLabel="This Week"
-        />
+        <TopCard no={1} path="topCustomers" timeLabel="This Week" />
+        <TopCard no={1} path="topCustomers" timeLabel="This Month" />
+        <TopCard no={1} path="topCustomers" timeLabel="This Year" />
       </div>
       <div className="">
         <CustomerDataTable

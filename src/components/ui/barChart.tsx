@@ -95,7 +95,7 @@ function getFirstDayOfTheYear(d: Date) {
 }
 
 export default function BarChartData({ Labal }: Props) {
-  const [data, setData] = useState();
+  const [data, setData] = useState<any | null>();
   const [filterDate, setFilterDate] = useState("thisMonth");
 
   useEffect(() => {

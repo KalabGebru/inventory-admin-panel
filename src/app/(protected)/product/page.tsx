@@ -264,27 +264,9 @@ export default function Products() {
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
       <div className="flex gap-8">
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topProducts"
-          timeLabel="This Week"
-        />
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topProducts"
-          timeLabel="This Month"
-        />
-        <TopCard
-          min="2023-10-10"
-          max="2023-10-17"
-          no={1}
-          path="topProducts"
-          timeLabel="This Year"
-        />
+        <TopCard no={1} path="topProducts" timeLabel="This Week" />
+        <TopCard no={1} path="topProducts" timeLabel="This Month" />
+        <TopCard no={1} path="topProducts" timeLabel="This Year" />
       </div>
       <div className="">
         <ProductDataTable

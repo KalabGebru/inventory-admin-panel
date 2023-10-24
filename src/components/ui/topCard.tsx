@@ -3,21 +3,53 @@ import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 type Props = {
-  min: string;
-  max: string;
   no: number;
   path: string;
-  timeLabel: string;
+  timeLabel: "This Week" | "This Month" | "This Year";
 };
-export default function TopCard({ min, max, no, path, timeLabel }: Props) {
-  const [data, setData] = useState();
+
+function getMonday(d: Date) {
+  d = new Date(d);
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff)).toISOString();
+  // .slice(0, 10);
+}
+
+function getFirstDayOfTheMonth(d: Date) {
+  let date_today = new Date(d);
+  let firstDay = new Date(
+    date_today.getFullYear(),
+    date_today.getMonth(),
+    1
+  ).toISOString();
+  return firstDay;
+}
+
+function getFirstDayOfTheYear(d: Date) {
+  let date_today = new Date(d);
+  let firstyear = new Date(date_today.getFullYear(), 0, 1).toISOString();
+  return firstyear;
+}
+
+export default function TopCard({ no, path, timeLabel }: Props) {
+  const [data, setData] = useState<any | null>();
 
   useEffect(() => {
-    const Data = {
-      min: min,
-      max: max,
-      No: no,
-    };
+    const now = new Date();
+    now.setDate(now.getDate() + 1);
+    const nowPlusone = now.toISOString().slice(0, 10);
+    console.log(nowPlusone, now);
+    const Data =
+      timeLabel == "This Week"
+        ? {
+            min: getMonday(new Date()),
+            max: nowPlusone,
+            No: no,
+          }
+        : timeLabel == "This Month"
+        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: no }
+        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: no };
 
     const res = fetch(`/api/${path}`, {
       method: "POST",

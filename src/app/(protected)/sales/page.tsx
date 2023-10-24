@@ -353,9 +353,9 @@ export default function Sales() {
   return (
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
       <div className="flex gap-8">
-        <TotalCard min="2023-10-10" max="2023-10-11" timeLabel="This Week" />
-        <TotalCard min="2023-10-10" max="2023-10-14" timeLabel="This Month" />
-        <TotalCard min="2023-10-10" max="2023-10-17" timeLabel="This Year" />
+        <TotalCard timeLabel="This Week" />
+        <TotalCard timeLabel="This Month" />
+        <TotalCard timeLabel="This Year" />
       </div>
 
       <div className="">

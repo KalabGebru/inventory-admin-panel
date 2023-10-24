@@ -71,21 +71,49 @@ import {
 //   },
 // ];
 
+function getMonday(d: Date) {
+  d = new Date(d);
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff)).toISOString();
+  // .slice(0, 10);
+}
+
+function getFirstDayOfTheMonth(d: Date) {
+  let date_today = new Date(d);
+  let firstDay = new Date(
+    date_today.getFullYear(),
+    date_today.getMonth(),
+    1
+  ).toISOString();
+  return firstDay;
+}
+
+function getFirstDayOfTheYear(d: Date) {
+  let date_today = new Date(d);
+  let firstyear = new Date(date_today.getFullYear(), 0, 1).toISOString();
+  return firstyear;
+}
+
 export default function PieChartData() {
-  const [data, setData] = useState();
+  const [data, setData] = useState<any | null>();
   const [filterDate, setFilterDate] = useState("thisMonth");
 
   useEffect(() => {
-    const now = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    now.setDate(now.getDate() + 1);
+    const nowPlusone = now.toISOString().slice(0, 10);
+    console.log(nowPlusone, now);
     const Data =
       filterDate == "thisWeek"
         ? {
-            min: "2023-10-15",
-            max: now,
+            min: getMonday(new Date()),
+            max: nowPlusone,
+            No: 5,
           }
         : filterDate == "thisMonth"
-        ? { min: "2023-10-01", max: "2023-10-23" }
-        : { min: "2023-01-01", max: now };
+        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: 5 }
+        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: 5 };
 
     const res = fetch(`/api/selesCustomerVs`, {
       method: "POST",
