@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { EditUsers } from "@/components/ui/editUsers";
+"use client";
 import Profile from "@/components/ui/profile";
+import { useTodo } from "@/hooks/useContextData";
 import services from "@/services/connect";
 
 type User = {
@@ -19,13 +19,13 @@ type Props = {
 };
 
 export default async function page({ params }: Props) {
+  const { users, setUsers } = useTodo();
+
   const username = params.user.replace("%20", " ");
   console.log(username);
 
-  const userData = (await services.GetAllUsers()) as User[];
-
-  if (!userData) return null;
-  const currentUser = userData.find((user) => user.username == username);
+  if (!users) return null;
+  const currentUser = users.find((user: User) => user.username == username);
   if (!currentUser) return <div className="">No User by that username</div>;
   const user = {
     role: currentUser.role,

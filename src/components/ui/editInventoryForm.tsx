@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useState } from "react";
 import EditHistory from "./edithistory";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 type Product = {
   image: string;
@@ -42,6 +43,7 @@ export default function EditInventoryForm({
 }: Props) {
   const { setInventory, setInventoryLoading } = useTodo();
   const [history, setHistory] = useState(inventory?.history);
+  const [sending, setSending] = useState(false);
   const router = useRouter();
 
   function fetchProductdata() {
@@ -59,9 +61,7 @@ export default function EditInventoryForm({
       });
   }
 
-  async function onSubmit() {
-    console.log(history);
-
+  async function EditInventory() {
     const postdata = {
       history,
       inventoryId: inventoryId,
@@ -77,7 +77,26 @@ export default function EditInventoryForm({
       console.log(response.result);
       fetchProductdata();
       router.push(`/inventory/`);
+      return response.result;
     }
+    throw Error("error");
+  }
+
+  async function onSubmit() {
+    console.log(history);
+
+    setSending(true);
+    toast.promise(EditInventory(), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Inventory has been edited`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -125,7 +144,9 @@ export default function EditInventoryForm({
       )}
 
       <div className="flex justify-end">
-        <Button onClick={onSubmit}>Submit</Button>
+        <Button disabled={sending} onClick={onSubmit}>
+          Submit
+        </Button>
       </div>
     </div>
   );

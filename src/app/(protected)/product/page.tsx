@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FiMoreVertical } from "react-icons/fi";
 import Link from "next/link";
+import { toast } from "sonner";
+import { error } from "console";
 type Cat = {
   datetime: string;
   catagoryName: string;
@@ -43,6 +45,7 @@ type Product = {
 export default function Products() {
   const { products, setProducts, catagory } = useTodo();
   console.log(products);
+  console.log(catagory);
 
   const productsData = products.map((P: Product) => {
     return {
@@ -72,7 +75,9 @@ export default function Products() {
       const response = await res.json();
       console.log(response.success);
       if (response.success) fetchProductdata();
+      return response.success;
     }
+    throw Error;
   }
 
   const columns: ColumnDef<Product>[] = [
@@ -246,7 +251,15 @@ export default function Products() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-red-400 text-white mt-2"
-                onClick={() => deleteProduct(rowdata.docId)}
+                onClick={() =>
+                  toast.promise(deleteProduct(rowdata.docId), {
+                    loading: "deleting...",
+                    success: (data) => {
+                      return `Product has been deleted`;
+                    },
+                    error: "Error",
+                  })
+                }
               >
                 Delete Product
               </DropdownMenuItem>

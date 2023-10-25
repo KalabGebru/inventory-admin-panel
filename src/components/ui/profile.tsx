@@ -7,6 +7,8 @@ import UploadImageToStorage from "./UploadImg";
 import Image from "next/image";
 import { BiSolidHide, BiSolidShow } from "react-icons/Bi";
 import { useRouter } from "next/navigation";
+import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 type User = {
   role: string;
   username: string;
@@ -19,6 +21,8 @@ type Props = {
   user: User;
 };
 export default function Profile({ user }: Props) {
+  const { setUsers, setUsersLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const [currentUserData, setCurrentUserData] = useState(user);
   const [editMail, setEditMail] = useState(false);
   const [editUsername, setEditUsername] = useState(false);
@@ -34,15 +38,31 @@ export default function Profile({ user }: Props) {
 
   const router = useRouter();
 
-  async function onSave() {
+  function fetchUsersdata() {
+    setUsersLoading(true);
+    fetch("/api/getUsers")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setUsers(data.Users);
+        setUsersLoading(false);
+        router.push(`/profile/${currentUserData.username}`);
+      })
+      .catch((err) => {
+        setUsersLoading(undefined);
+        console.log(err);
+      });
+  }
+
+  async function EditProfile() {
     if (
       changePassword &&
       (currentPassword.length < 6 || newPassword.length < 6)
     ) {
-      return alert("Password length must be at least 6 catacters");
+      throw Error("Password length must be at least 6 catacters");
     }
     if (changePassword && currentPassword === newPassword) {
-      return alert("Current password and new password are the same");
+      throw Error("Current password and new password are the same");
     }
     const newdata = {
       ...currentUserData,
@@ -57,41 +77,53 @@ export default function Profile({ user }: Props) {
       newdata.newPassword = newPassword;
     }
     console.log(newdata);
-    try {
-      const Userexist = await fetch("/api/userExists", {
-        method: "POST",
-        body: JSON.stringify({
-          docId: currentUserData.docId,
-          username: currentUserData.username,
-        }),
-      });
 
-      if (Userexist.ok) {
-        const response = await Userexist.json();
-        console.log(response.exist);
-        if (response.exist) {
-          alert(`Username '${currentUserData.username}' exists`);
-          return;
-        }
-      }
-      const res = await fetch("/api/editUser", {
-        method: "POST",
-        body: JSON.stringify(newdata),
-      });
+    const Userexist = await fetch("/api/userExists", {
+      method: "POST",
+      body: JSON.stringify({
+        docId: currentUserData.docId,
+        username: currentUserData.username,
+      }),
+    });
 
-      if (res.ok) {
-        const response = await res.json();
-        console.log(response);
-        if (!response.passwordMatch) {
-          alert("Current Password Doesn't match");
-        }
-        if (response.updated) {
-          router.push(`/profile/${currentUserData.username}`);
-        }
+    if (Userexist.ok) {
+      const response = await Userexist.json();
+      if (response.exist) {
+        throw Error(`Username '${currentUserData.username}' exists`);
       }
-    } catch (error) {
-      console.log(error);
     }
+    const res = await fetch("/api/editUser", {
+      method: "POST",
+      body: JSON.stringify(newdata),
+    });
+
+    if (res.ok) {
+      const response = await res.json();
+      console.log(response);
+      if (!response.passwordMatch) {
+        alert("Current Password Doesn't match");
+      }
+      if (response.updated) {
+        fetchUsersdata();
+        return response.updated;
+      }
+    }
+    throw Error("error");
+  }
+
+  async function onSave() {
+    setSending(true);
+    toast.promise(EditProfile(), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `User Profile has been updated`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (

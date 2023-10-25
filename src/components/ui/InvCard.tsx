@@ -1,13 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import { useTodo } from "@/hooks/useContextData";
 
 type Props = {
   no: number;
   Labal: string;
 };
 export default function InvCard({ no, Labal }: Props) {
-  const [data, setData] = useState();
+  const { catagory } = useTodo();
+  console.log(catagory);
+  const [data, setData] = useState<any | null>();
 
   const type = Labal == "Product" ? "topByNo" : "topByNoC";
   const typeC = Labal == "Product" ? "topByPrice" : "topByPriceC";
@@ -29,6 +32,8 @@ export default function InvCard({ no, Labal }: Props) {
   }, []);
 
   if (!data) return null;
+
+  console.log(data);
 
   return (
     <div className="border rounded-md p-6 min-w-[300px]">
@@ -53,9 +58,11 @@ export default function InvCard({ no, Labal }: Props) {
                 )}
               </div>
               <span className="text-xl">
-                {data.result[type][0].product_name &&
-                  data.result[type][0].product_name}
-                {Labal == "Catagory" && data.result[type][0].catagory}
+                {Labal == "Catagory"
+                  ? catagory.find(
+                      (c: any) => c.docId === data.result[type][0].catagory
+                    ).catagoryName
+                  : data.result[type][0].product_name}
               </span>
             </div>
             <h2 className="text-2xl">
@@ -68,7 +75,7 @@ export default function InvCard({ no, Labal }: Props) {
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result[type][0].price}</span>
+                <span className="">${data.result[type][0].price}</span>
               </h3>
             </div>
           </div>
@@ -84,9 +91,11 @@ export default function InvCard({ no, Labal }: Props) {
                 )}
               </div>
               <span className="text-xl">
-                {data.result[type][0].product_name &&
-                  data.result[type][0].product_name}
-                {Labal == "Catagory" && data.result[type][0].catagory}
+                {Labal == "Catagory"
+                  ? catagory.find(
+                      (c: any) => c.docId === data.result[type][0].catagory
+                    ).catagoryName
+                  : data.result[type][0].product_name}
               </span>
             </div>
             <h2 className="text-2xl">Price : {data.result[typeC][0].price}</h2>
@@ -97,7 +106,7 @@ export default function InvCard({ no, Labal }: Props) {
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result[typeC][0].price}</span>
+                <span className="">${data.result[typeC][0].price}</span>
               </h3>
             </div>
           </div>

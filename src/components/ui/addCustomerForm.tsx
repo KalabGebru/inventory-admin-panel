@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Checkbox } from "./checkbox";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   first_name: z.string().min(2, {
@@ -82,6 +83,7 @@ export default function AddCustomerForm({
 }: Props) {
   const { setCustomer, setCustomerLoading } = useTodo();
   const [allowed, setAllowed] = useState(false);
+  const [sending, setSending] = useState(false);
   const [max, setMax] = useState(editMode ? defaultValue?.credit.max : 0);
   const [used, setUsed] = useState(editMode ? defaultValue?.credit.used : 0);
 
@@ -116,9 +118,7 @@ export default function AddCustomerForm({
       });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
-
+  async function AddEditCustomer(data: z.infer<typeof FormSchema>) {
     let res;
     if (editMode && docId) {
       const newData = {
@@ -151,7 +151,26 @@ export default function AddCustomerForm({
       console.log(response.result);
       fetchCustomerdata();
       router.push(`/customer/`);
+      return response.result;
     }
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
+
+    setSending(true);
+    toast.promise(AddEditCustomer(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Customer has been ${editMode ? "edited" : "added"}`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -330,7 +349,9 @@ export default function AddCustomerForm({
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

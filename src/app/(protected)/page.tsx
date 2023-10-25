@@ -18,17 +18,17 @@ export default function Home() {
         {/* <div className=" text-white text-3xl">{session?.user.role}</div> */}
         {/* <ApiCall /> */}
         {/* <RenderLineChart /> */}
-        <div className="flex flex-wrap gap-4 box-border">
-          <div className="w-1/2 box-border">
+        <div className="flex flex-wrap gap-8 box-border">
+          <div className="w-[45%] box-border">
             <BarChartData Labal="Top Product" />
           </div>
-          <div className="w-1/2 box-border">
+          <div className="w-[45%] box-border">
             <BarChartData Labal="Top Customer" />
           </div>
-          <div className="w-1/2 box-border">
+          <div className="w-[45%] box-border">
             <BarChartData Labal="Top Catagory" />
           </div>
-          <div className="w-1/2 box-border">
+          <div className="w-[45%] box-border">
             <PieChartData />
           </div>
         </div>

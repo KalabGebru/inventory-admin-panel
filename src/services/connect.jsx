@@ -415,6 +415,16 @@ const services = {
       return undefined;
     }
   },
+  DeleteUser: async (Id) => {
+    const userref = doc(db, "Users", Id);
+    try {
+      await deleteDoc(userref);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  },
   UploadImage: async (file) => {
     console.log(file);
     const name = file.name;

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FiMoreVertical } from "react-icons/fi";
 import Link from "next/link";
+import { toast } from "sonner";
 // import { people } from "@/lib/customers";
 
 type credit = { allowed: boolean; max: number; used: number };
@@ -64,7 +65,9 @@ export default function Customer() {
       const response = await res.json();
       console.log(response.success);
       if (response.success) fetchCustomerdata();
+      return response.success;
     }
+    throw Error;
   }
 
   const columns: ColumnDef<Customer>[] = [
@@ -237,7 +240,16 @@ export default function Customer() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-red-400 text-white mt-2"
-                onClick={() => deleteCustomer(rowdata.docId)}
+                // onClick={() => deleteCustomer(rowdata.docId)}
+                onClick={() =>
+                  toast.promise(deleteCustomer(rowdata.docId), {
+                    loading: "deleting...",
+                    success: (data) => {
+                      return `Customer has been deleted`;
+                    },
+                    error: "Error",
+                  })
+                }
               >
                 Delete Customer
               </DropdownMenuItem>

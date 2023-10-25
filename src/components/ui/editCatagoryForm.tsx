@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import EditCat from "./editCat";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 type cat = {
   datetime: string;
@@ -20,6 +21,7 @@ type Props = {
 export default function EditCatagoryForm({ catagory }: Props) {
   const { setCatagory, setCatagoryLoading } = useTodo();
   const [catagorys, setCatagorys] = useState(catagory);
+  const [sending, setSending] = useState(false);
   console.log(catagorys);
   const router = useRouter();
 
@@ -38,9 +40,7 @@ export default function EditCatagoryForm({ catagory }: Props) {
       });
   }
 
-  async function onSubmit() {
-    console.log(catagorys);
-
+  async function EditCatagory() {
     const sentdata = {
       catagorys: catagorys,
     };
@@ -55,7 +55,26 @@ export default function EditCatagoryForm({ catagory }: Props) {
       console.log(response.result);
       fetchCatagorydata();
       router.push(`/product/`);
+      return response.result;
     }
+    throw Error("error");
+  }
+
+  async function onSubmit() {
+    console.log(catagorys);
+
+    setSending(true);
+    toast.promise(EditCatagory(), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Inventory has been edited`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -81,7 +100,9 @@ export default function EditCatagoryForm({ catagory }: Props) {
       )}
 
       <div className="flex justify-end">
-        <Button onClick={onSubmit}>Submit</Button>
+        <Button disabled={sending} onClick={onSubmit}>
+          Submit
+        </Button>
       </div>
     </div>
   );

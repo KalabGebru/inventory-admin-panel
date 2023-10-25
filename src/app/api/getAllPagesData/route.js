@@ -3,34 +3,42 @@ import services from "@/services/connect";
 export const GET = async (request) => {
   console.log("Customers");
   try {
-    const Products = await services.GetAllProducts();
-    const Sales = await services.GetAllSeles();
-    const Customers = await services.GetAllCustomers();
-    const Inventory = await services.GetAllInventorys();
-    const Catagorys = await services.GetAllCatagorys();
-    const Users = await services.GetAllUsers();
+    // const Products = await services.GetAllProducts();
+    // const Sales = await services.GetAllSeles();
+    // const Customers = await services.GetAllCustomers();
+    // const Inventory = await services.GetAllInventorys();
+    // const Catagorys = await services.GetAllCatagorys();
+    // const Users = await services.GetAllUsers();
 
-    console.log(Customers);
+    const promises = [
+      services.GetAllProducts(),
+      services.GetAllCustomers(),
+      services.GetAllCatagorys(),
+      services.GetAllInventorys(),
+      services.GetAllSeles(),
+      services.GetAllUsers(),
+    ];
 
-    if (
-      !Products ||
-      !Sales ||
-      !Customers ||
-      !Inventory ||
-      !Catagorys ||
-      !Users
-    ) {
-      throw Error;
-    }
+    const AllResults = await Promise.allSettled(promises);
+
+    console.log(AllResults);
+
+    // console.log(Customers);
+
+    // if (
+    //   !Products ||
+    //   !Sales ||
+    //   !Customers ||
+    //   !Inventory ||
+    //   !Catagorys ||
+    //   !Users
+    // ) {
+    //   throw Error;
+    // }
 
     return new Response(
       JSON.stringify({
-        Products: Products,
-        Sales: Sales,
-        Customers: Customers,
-        Inventory: Inventory,
-        Catagorys: Catagorys,
-        Users: Users,
+        AllResults: AllResults,
       }),
       {
         status: 200,

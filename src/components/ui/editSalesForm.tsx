@@ -18,6 +18,7 @@ import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { Checkbox } from "./checkbox";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 type Sales = {
   customer: string;
@@ -77,6 +78,7 @@ type Items = {
 
 export default function EditSalesForm({ customers, product, sales }: Props) {
   const { setSales, setSalesLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const selectedCustomer = customers.find(
     (c) => c.docId === sales.customer
   ) as Customer;
@@ -124,13 +126,33 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
       });
   }
 
-  async function onSubmit() {
-    if (!customer) {
-      return alert(`you haven't selected customer `);
-    }
+  async function EditSales() {
     if (items.length == 0) {
-      return alert(`you haven't selected products`);
+      throw Error(`you haven't selected products`);
     }
+    if (
+      selectedCustomer &&
+      paidIn === "credit" &&
+      selectedCustomer.credit.max != 0
+    ) {
+      let left;
+      if (sales.paidIn == "credit") {
+        left =
+          selectedCustomer.credit.max -
+          selectedCustomer.credit.used +
+          sales.totalAmount;
+      } else {
+        left = selectedCustomer.credit.max - selectedCustomer.credit.used;
+      }
+
+      if (Total > left)
+        throw Error(
+          `the customer only has ${left} credits. Maybe use mixed and pay the rest ${
+            Total - left
+          } in cash`
+        );
+    }
+
     const senddata = {
       customer: customer?.docId,
       items: items.map((item) => {
@@ -154,8 +176,25 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
       if (response.result.edited) {
         fetchSalesdata();
         router.push(`/sales/`);
+        return response.result.edited;
       }
     }
+    throw Error("error");
+  }
+
+  async function onSubmit() {
+    setSending(true);
+    toast.promise(EditSales(), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Sales has been added`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   function subtruct(id: string) {
@@ -331,7 +370,9 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
       )}
 
       <div className="flex justify-end">
-        <Button onClick={onSubmit}>Submit</Button>
+        <Button disabled={sending} onClick={onSubmit}>
+          Submit
+        </Button>
       </div>
     </div>
   );

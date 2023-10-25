@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FiMoreVertical } from "react-icons/fi";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type Items = {
   no: number;
@@ -127,7 +128,9 @@ export default function Sales() {
       const response = await res.json();
       console.log(response.success);
       if (response.success) fetchSalesdata();
+      return response.success;
     }
+    throw Error("error");
   }
 
   const columns: ColumnDef<SalesViewData>[] = [
@@ -339,7 +342,16 @@ export default function Sales() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-red-400 text-white mt-2"
-                onClick={() => deleteSales(rowdata.docId)}
+                // onClick={() => deleteSales(rowdata.docId)}
+                onClick={() =>
+                  toast.promise(deleteSales(rowdata.docId), {
+                    loading: "deleting sales...",
+                    success: (data) => {
+                      return `Sales has been deleted`;
+                    },
+                    error: "Error",
+                  })
+                }
               >
                 Delete Sales
               </DropdownMenuItem>

@@ -62,13 +62,15 @@ export default function SideNavbar({ Admin, session }: Props) {
   return (
     <aside className="sticky max-h-screen top-0 flex flex-col border-r shadow-sm">
       <div className="flex items-center justify-between mb-32 p-4">
-        <div
-          className={`overflow-hidden text-2xl transition-all ${
-            expanded ? "w-fit" : "w-0"
-          }`}
-        >
-          <span className="text-green-300 font-bold">Admin</span>Logo
-        </div>
+        <Link href={"/"}>
+          <div
+            className={`overflow-hidden text-2xl transition-all ${
+              expanded ? "w-fit" : "w-0"
+            }`}
+          >
+            <span className="text-green-300 font-bold">Admin</span>Logo
+          </div>
+        </Link>
 
         <Button
           variant={"ghost"}

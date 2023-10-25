@@ -62,7 +62,11 @@ export default function TopCard({ no, path, timeLabel }: Props) {
       });
   }, []);
 
-  if (!data) return null;
+  if (
+    !data ||
+    (data?.result.topByNo.length == 0 && data?.result.topByPrice.length == 0)
+  )
+    return null;
 
   return (
     <div className="border rounded-md p-6 min-w-[300px]">
@@ -83,23 +87,23 @@ export default function TopCard({ no, path, timeLabel }: Props) {
                 <h1 className="font-bold text-xl">Top Product</h1>
               </div>
               <span className="text-xl">
-                {data.result.topByNo[0].product_name &&
-                  data.result.topByNo[0].product_name}
-                {data.result.topByNo[0].first_name &&
-                  `${data.result.topByNo[0].first_name} ${data.result.topByNo[0].last_name}`}
+                {data.result.topByNo[0]?.product_name &&
+                  data.result.topByNo[0]?.product_name}
+                {data.result.topByNo[0]?.first_name &&
+                  `${data.result.topByNo[0]?.first_name} ${data.result.topByNo[0]?.last_name}`}
               </span>
             </div>
             <h2 className="text-2xl">
-              No of Items : {data.result.topByNo[0].no}
+              No of Items : {data.result.topByNo[0]?.no}
             </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result.topByNo[0].no}</span>
+                <span className="">{data.result.topByNo[0]?.no}</span>
                 <span className="">Items Bought this week</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result.topByNo[0].price}</span>
+                <span className="">{data.result.topByNo[0]?.price}</span>
               </h3>
             </div>
           </div>
@@ -111,23 +115,23 @@ export default function TopCard({ no, path, timeLabel }: Props) {
                 <h1 className="font-bold text-xl">Top Product</h1>
               </div>
               <span className="text-xl">
-                {data.result.topByPrice[0].product_name &&
-                  data.result.topByPrice[0].product_name}
-                {data.result.topByPrice[0].first_name &&
-                  `${data.result.topByPrice[0].first_name} ${data.result.topByPrice[0].last_name}`}
+                {data.result.topByPrice[0]?.product_name &&
+                  data.result.topByPrice[0]?.product_name}
+                {data.result.topByPrice[0]?.first_name &&
+                  `${data.result.topByPrice[0]?.first_name} ${data.result.topByPrice[0]?.last_name}`}
               </span>
             </div>
             <h2 className="text-2xl">
-              Price : {data.result.topByPrice[0].price}
+              Price : {data.result.topByPrice[0]?.price}
             </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result.topByPrice[0].no}</span>
+                <span className="">{data.result.topByPrice[0]?.no}</span>
                 <span className="">Items Bought this week</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result.topByPrice[0].price}</span>
+                <span className="">{data.result.topByPrice[0]?.price}</span>
               </h3>
             </div>
           </div>

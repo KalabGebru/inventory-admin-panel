@@ -20,6 +20,7 @@ import {
 import { FiMoreVertical } from "react-icons/fi";
 import Link from "next/link";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 type Product = {
   image: string;
@@ -108,7 +109,9 @@ export default function Inventory() {
       const response = await res.json();
       console.log(response.success);
       if (response.success) fetchInventorydata();
+      return response.success;
     }
+    throw Error;
   }
 
   const columns: ColumnDef<InventoryViewData>[] = [
@@ -285,7 +288,16 @@ export default function Inventory() {
               <DropdownMenuItem
                 className="bg-red-400 text-white mt-2"
                 onClick={() =>
-                  deleteInventory(rowdata.docId, rowdata.productId)
+                  toast.promise(
+                    deleteInventory(rowdata.docId, rowdata.productId),
+                    {
+                      loading: "deleting...",
+                      success: (data) => {
+                        return `Inventory has been deleted`;
+                      },
+                      error: "Error",
+                    }
+                  )
                 }
               >
                 Delete Inventory

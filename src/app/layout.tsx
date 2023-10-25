@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster, toast } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system">
           <div>{children}</div>
         </ThemeProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

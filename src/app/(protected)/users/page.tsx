@@ -4,7 +4,6 @@ import services from "@/services/connect";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import UserDataTable from "./data-table";
-import { columns } from "./columns";
 import { useTodo } from "@/hooks/useContextData";
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FiMoreVertical } from "react-icons/fi";
+import { toast } from "sonner";
 
 type User = {
   role: string;
@@ -67,7 +67,9 @@ export default function page() {
       const response = await res.json();
       console.log(response.success);
       if (response.success) fetchUsersdata();
+      return response.success;
     }
+    throw Error;
   }
 
   const columns: ColumnDef<User>[] = [
@@ -212,7 +214,16 @@ export default function page() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="bg-red-400 text-white mt-2"
-                onClick={() => deleteUser(rowdata.docId)}
+                // onClick={() => deleteUser(rowdata.docId)}
+                onClick={() =>
+                  toast.promise(deleteUser(rowdata.docId), {
+                    loading: "deleting...",
+                    success: (data) => {
+                      return `User has been deleted`;
+                    },
+                    error: "Error",
+                  })
+                }
               >
                 Delete User
               </DropdownMenuItem>

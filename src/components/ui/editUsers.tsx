@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { BiSolidShow } from "react-icons/Bi";
 import { BiSolidHide } from "react-icons/Bi";
-import { toast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -28,6 +27,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -55,6 +55,7 @@ type Props = {
 
 export function EditUsers({ user }: Props) {
   const { setUsers, setUsersLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const [changePassword, setChangePassword] = useState(false);
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [hideCurrentPassword, setHideCurrentPassword] = useState(true);
@@ -87,23 +88,15 @@ export function EditUsers({ user }: Props) {
       });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function EditUser(data: z.infer<typeof FormSchema>) {
     if (
       changePassword &&
       (currentPassword.length < 6 || newPassword.length < 6)
     ) {
-      return alert("Password length must be at least 6 catacters");
+      throw Error("Password length must be at least 6 catacters");
     }
     if (changePassword && currentPassword === newPassword) {
-      return alert("Current password and new password are the same");
+      throw Error("Current password and new password are the same");
     }
     const newdata = {
       ...data,
@@ -120,39 +113,53 @@ export function EditUsers({ user }: Props) {
       newdata.newPassword = newPassword;
     }
     console.log(newdata);
-    try {
-      const Userexist = await fetch("/api/userExists", {
-        method: "POST",
-        body: JSON.stringify({ docId: user.docId, username: data.username }),
-      });
 
-      if (Userexist.ok) {
-        const response = await Userexist.json();
-        console.log(response.exist);
-        if (response.exist) {
-          alert(`Username '${data.username}' exists`);
-          return;
-        }
-      }
-      const res = await fetch("/api/editUser", {
-        method: "POST",
-        body: JSON.stringify(newdata),
-      });
+    const Userexist = await fetch("/api/userExists", {
+      method: "POST",
+      body: JSON.stringify({ docId: user.docId, username: data.username }),
+    });
 
-      if (res.ok) {
-        const response = await res.json();
-        console.log(response);
-        if (!response.passwordMatch) {
-          alert("Current Password Doesn't match");
-        }
-        if (response.updated) {
-          fetchUsersdata();
-          router.push(`/users/`);
-        }
+    if (Userexist.ok) {
+      const response = await Userexist.json();
+      console.log(response.exist);
+      if (response.exist) {
+        throw Error(`Username '${data.username}' exists`);
       }
-    } catch (error) {
-      console.log(error);
     }
+    const res = await fetch("/api/editUser", {
+      method: "POST",
+      body: JSON.stringify(newdata),
+    });
+
+    if (res.ok) {
+      const response = await res.json();
+      console.log(response);
+      if (!response.passwordMatch) {
+        throw Error("Current Password Doesn't match");
+      }
+      if (response.updated) {
+        fetchUsersdata();
+        router.push(`/users/`);
+        return response.updated;
+      }
+    }
+
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setSending(true);
+    toast.promise(EditUser(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `User "${data.username}" has been Edited`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -288,7 +295,9 @@ export function EditUsers({ user }: Props) {
             </Button>
           )}
           <div className="flex justify-end items-center w-full mt-4">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

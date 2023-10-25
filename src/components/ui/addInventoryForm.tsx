@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { useTodo } from "@/hooks/useContextData";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type Product = {
   image: string;
@@ -56,6 +58,7 @@ export default function AddInventoryForm({
   inventory,
 }: Props) {
   const { setInventory, setInventoryLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -77,8 +80,7 @@ export default function AddInventoryForm({
       });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+  async function AddToInventory(data: z.infer<typeof FormSchema>) {
     const postdata = {
       ...data,
       inventoryId: inventoryId,
@@ -94,7 +96,25 @@ export default function AddInventoryForm({
       console.log(response.result);
       fetchProductdata();
       router.push(`/inventory/`);
+      return response.result;
     }
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
+    setSending(true);
+    toast.promise(AddToInventory(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `${data.addedAmount} ${product.product_name} has been added to the Inventory`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -182,7 +202,9 @@ export default function AddInventoryForm({
           />
 
           <div className="flex justify-end">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

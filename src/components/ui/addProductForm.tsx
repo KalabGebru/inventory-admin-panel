@@ -29,6 +29,7 @@ import { useEffect, useState } from "react";
 import UploadImageToStorage from "./UploadImg";
 import Image from "next/image";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   id: z.string(),
@@ -82,6 +83,7 @@ export default function AddProductForm({
 }: Props) {
   // const [file, setfile] = useState<File>();
   const { setProducts, setProductsLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const [catagorys, setCatagorys] = useState([]);
   const [image, setImage] = useState(
     editMode ? { image: defaultValue?.image } : { image: "" }
@@ -132,9 +134,7 @@ export default function AddProductForm({
     });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
-
+  async function AddEditProduct(data: z.infer<typeof FormSchema>) {
     objectToFormData(data);
     if (image.image) {
       formData.append("image", image.image);
@@ -160,12 +160,32 @@ export default function AddProductForm({
       const response = await res.json();
       console.log(response.result);
       if (response.alreadyExist) {
-        alert(`a product with ${data.id} already exists`);
+        // alert(`a product with ${data.id} already exists`);
+        throw Error(`a product with ${data.id} already exists`);
       } else {
         fetchProductdata();
         router.push(`/product/`);
+        return response.result;
       }
     }
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
+
+    setSending(true);
+    toast.promise(AddEditProduct(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Product has been ${editMode ? "edited" : "added"}`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   if (!catagorys) return null;
@@ -300,7 +320,9 @@ export default function AddProductForm({
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

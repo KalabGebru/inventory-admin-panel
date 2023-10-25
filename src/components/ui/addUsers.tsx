@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { BiSolidShow } from "react-icons/Bi";
 import { BiSolidHide } from "react-icons/Bi";
-import { toast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -27,8 +26,8 @@ import {
 } from "./select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Card, CardContent, CardHeader } from "./card";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -47,6 +46,7 @@ const FormSchema = z.object({
 
 export function AddUsers() {
   const { setUsers, setUsersLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
   const router = useRouter();
 
@@ -69,44 +69,47 @@ export function AddUsers() {
       });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  async function AddUser(data: z.infer<typeof FormSchema>) {
+    const Userexist = await fetch("/api/userExists", {
+      method: "POST",
+      body: JSON.stringify(data),
     });
 
-    try {
-      const Userexist = await fetch("/api/userExists", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-
-      if (Userexist.ok) {
-        const response = await Userexist.json();
-        console.log(response.exist);
-        if (response.exist) {
-          alert(`Username '${data.username}' exists`);
-          return;
-        }
+    if (Userexist.ok) {
+      const response = await Userexist.json();
+      console.log(response.exist);
+      if (response.exist) {
+        throw Error(`Username '${data.username}' already exists`);
       }
-      const res = await fetch("/api/registerUser", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-
-      if (res.ok) {
-        const response = await res.json();
-        console.log(response.result);
-        fetchUsersdata();
-        router.push(`/users/`);
-      }
-    } catch (error) {
-      console.log(error);
     }
+    const res = await fetch("/api/registerUser", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      const response = await res.json();
+      console.log(response.result);
+      fetchUsersdata();
+      router.push(`/users/`);
+      return response.result;
+    }
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setSending(true);
+    toast.promise(AddUser(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `User "${data.username}" has been added`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -209,7 +212,9 @@ export function AddUsers() {
             )}
           />
           <div className="flex justify-end items-center w-full mt-2">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

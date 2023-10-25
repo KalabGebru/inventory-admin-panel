@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
+import { useState } from "react";
 
 type Cat = {
   datetime: string;
@@ -32,6 +34,7 @@ const FormSchema = z.object({
 
 export default function AddCatagoryForm() {
   const { catagory, setCatagory, setCatagoryLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -53,8 +56,7 @@ export default function AddCatagoryForm() {
       });
   }
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+  async function AddCatagory(data: z.infer<typeof FormSchema>) {
     const postdata = {
       catagoryName: data.newCatagory,
     };
@@ -69,7 +71,25 @@ export default function AddCatagoryForm() {
       console.log(response.result);
       fetchCatagorydata();
       router.push(`/product/`);
+      return response.result;
     }
+    throw Error("error");
+  }
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
+    setSending(true);
+    toast.promise(AddCatagory(data), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `${data.newCatagory} has been added to the Catagory`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -126,7 +146,9 @@ export default function AddCatagoryForm() {
           />
 
           <div className="flex justify-end">
-            <Button type="submit">Submit</Button>
+            <Button disabled={sending} type="submit">
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

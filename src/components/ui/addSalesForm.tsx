@@ -11,13 +11,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Combobox } from "./Combobox";
 import { ComboboxProduct } from "./ComboboxProduct";
 import { Card, CardContent } from "./card";
 import Image from "next/image";
 import { Checkbox } from "./checkbox";
 import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
+import { Input } from "./input";
 
 type Customer = {
   docId: string;
@@ -51,12 +53,15 @@ type Items = {
 
 export default function AddSalesForm() {
   const { products, customer, setSales, setSalesLoading } = useTodo();
+  const [sending, setSending] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
   >();
   const [items, setItems] = useState<Items[]>([]);
   const [paidIn, setPaidIn] = useState("cash");
   const [discounted, setDiscounted] = useState(false);
+
+  console.log(products);
 
   const router = useRouter();
   let Total: number = 0;
@@ -84,12 +89,9 @@ export default function AddSalesForm() {
       });
   }
 
-  async function onSubmit() {
-    // if (!customer) {
-    //   return alert(`you haven't selected customer `);
-    // }
+  async function AddSales() {
     if (items.length == 0) {
-      return alert(`you haven't selected products`);
+      throw Error(`you haven't selected products`);
     }
 
     if (
@@ -99,7 +101,7 @@ export default function AddSalesForm() {
     ) {
       const left = selectedCustomer.credit.max - selectedCustomer.credit.used;
       if (Total > left)
-        return alert(
+        throw Error(
           `the customer only has ${left} credits. Maybe use mixed and pay the rest ${
             Total - left
           } in cash`
@@ -128,8 +130,25 @@ export default function AddSalesForm() {
       if (response.result.created) {
         fetchSalesdata();
         router.push(`/sales/`);
+        return response.result.created;
       }
     }
+    throw Error("error");
+  }
+
+  async function onSubmit() {
+    setSending(true);
+    toast.promise(AddSales(), {
+      loading: "sending data ...",
+      success: (res) => {
+        setSending(false);
+        return `Sales has been added`;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   function subtruct(id: string) {
@@ -299,7 +318,9 @@ export default function AddSalesForm() {
       )}
 
       <div className="flex justify-end">
-        <Button onClick={onSubmit}>Submit</Button>
+        <Button disabled={sending} onClick={onSubmit}>
+          Submit
+        </Button>
       </div>
     </div>
   );

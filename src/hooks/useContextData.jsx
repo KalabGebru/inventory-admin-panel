@@ -31,21 +31,45 @@ export function DataProvider({ children }) {
     setUsersLoading(true);
     fetch("/api/getAllPagesData")
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventory(data.Inventory);
-        setProducts(data.Products);
-        setCatagory(data.Catagorys);
-        setCustomer(data.Customers);
-        setSales(data.Sales);
-        setUsers(data.Users);
-        //////
-        setProductsLoading(false);
-        setCatagoryLoading(false);
-        setCustomerLoading(false);
-        setInventoryLoading(false);
-        setSalesLoading(false);
-        setUsersLoading(false);
+      .then((alldata) => {
+        console.log(alldata);
+        const data = alldata.AllResults;
+        if (data[0].status == "fulfilled") {
+          setProducts(data[0].value);
+          setProductsLoading(false);
+        } else {
+          setProductsLoading(undefined);
+        }
+        if (data[1].status == "fulfilled") {
+          setCustomer(data[1].value);
+          setCustomerLoading(false);
+        } else {
+          setCustomerLoading(undefined);
+        }
+        if (data[2].status == "fulfilled") {
+          setCatagory(data[2].value);
+          setCatagoryLoading(false);
+        } else {
+          setCatagoryLoading(undefined);
+        }
+        if (data[3].status == "fulfilled") {
+          setInventory(data[3].value);
+          setInventoryLoading(false);
+        } else {
+          setInventoryLoading(undefined);
+        }
+        if (data[4].status == "fulfilled") {
+          setSales(data[4].value);
+          setSalesLoading(false);
+        } else {
+          setSalesLoading(undefined);
+        }
+        if (data[5].status == "fulfilled") {
+          setUsers(data[5].value);
+          setUsersLoading(false);
+        } else {
+          setUsersLoading(undefined);
+        }
       })
       .catch((err) => {
         setProductsLoading(undefined);
