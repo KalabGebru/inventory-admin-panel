@@ -9,6 +9,15 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
+import { useEffect, useState } from "react";
 
 const data = [
   {
@@ -56,32 +65,161 @@ const data = [
 ];
 
 export default function RenderLineChart() {
+  const [data, setData] = useState<any | null>();
+
+  useEffect(() => {
+    const res = fetch(`/api/allTotalSales`)
+      .then((response) => response.json())
+      .then((data: any) => {
+        console.log(data);
+        setData(data);
+      });
+  }, []);
+
+  if (!data) return null;
+
+  const week = data?.result?.thisWeek;
+  const month = data?.result?.thisMonth;
+  const year = data?.result?.thisYear;
+
+  const tickFormatter = (value: string, index: number) => {
+    const limit = 3; // put your maximum character
+    if (value.length < limit) return value;
+    return `${value.substring(0, limit)}`;
+  };
+
   return (
-    // <ResponsiveContainer width="100%" height="100%">
-    <LineChart
-      width={500}
-      height={300}
-      data={data}
-      margin={{
-        top: 5,
-        right: 30,
-        left: 20,
-        bottom: 5,
-      }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Line
-        type="monotone"
-        dataKey="pv"
-        stroke="#8884d8"
-        activeDot={{ r: 8 }}
-      />
-      <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-    </LineChart>
-    // </ResponsiveContainer>
+    <div className="border rounded-lg p-4">
+      <Tabs defaultValue="Week" className="">
+        <div className="flex items-center justify-between gap-8 mb-8">
+          {/* <Select
+           onValueChange={(value) => setFilterDate(value)}
+           defaultValue={filterDate}
+         >
+           <SelectTrigger className="w-[180px]">
+             <SelectValue placeholder="Date" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="thisWeek">This Week</SelectItem>
+             <SelectItem value="thisMonth">This Month</SelectItem>
+             <SelectItem value="thisYear">This year</SelectItem>
+           </SelectContent>
+         </Select> */}
+          <TabsList className="grid grid-cols-3 w-fit">
+            <TabsTrigger value="Week">Week</TabsTrigger>
+            <TabsTrigger value="Month">Month</TabsTrigger>
+            <TabsTrigger value="Year">Year</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="Week">
+          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+            This Week Sales
+          </h1>
+          <div className="w-full aspect-video">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                width={500}
+                height={300}
+                data={week}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {/* <Line
+            type="monotone"
+            dataKey="pv"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          /> */}
+                <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </TabsContent>
+        <TabsContent value="Month">
+          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+            This Month Sales
+          </h1>
+          <div className="w-full aspect-video">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                width={500}
+                height={300}
+                data={month}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  height={50}
+                  dataKey="name"
+                  // tickFormatter={tickFormatter}
+                  label={{
+                    value: `${month[0].name.slice(3, 7)}`,
+                    angle: 0,
+                    position: "insideBottom",
+                  }}
+                />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="sum"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                />
+                {/* <Line type="monotone" dataKey="sum" stroke="#82ca9d" /> */}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </TabsContent>
+        <TabsContent value="Year">
+          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+            This Year Sales
+          </h1>
+          <div className="w-full aspect-video">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                width={500}
+                height={300}
+                data={year}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" tickFormatter={tickFormatter} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {/* <Line
+            type="monotone"
+            dataKey="pv"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          /> */}
+                <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

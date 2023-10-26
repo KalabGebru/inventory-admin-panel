@@ -37,7 +37,7 @@ type Customer = {
 };
 
 export default function Customer() {
-  const { customer, setCustomer } = useTodo();
+  const { customer, setCustomer, setCustomerLoading } = useTodo();
   console.log(customer);
 
   function fetchCustomerdata() {

@@ -16,9 +16,12 @@ export default function Home() {
     <main className="flex flex-col h-full w-full justify-between p-12 gap-8">
       <div className="flex flex-col w-full h-full justify-center gap-8">
         {/* <div className=" text-white text-3xl">{session?.user.role}</div> */}
-        {/* <ApiCall /> */}
-        {/* <RenderLineChart /> */}
+        <ApiCall />
+
         <div className="flex flex-wrap gap-8 box-border">
+          <div className="w-[60%] box-border">
+            <RenderLineChart />
+          </div>
           <div className="w-[45%] box-border">
             <BarChartData Labal="Top Product" />
           </div>
@@ -28,6 +31,7 @@ export default function Home() {
           <div className="w-[45%] box-border">
             <BarChartData Labal="Top Catagory" />
           </div>
+
           <div className="w-[45%] box-border">
             <PieChartData />
           </div>
