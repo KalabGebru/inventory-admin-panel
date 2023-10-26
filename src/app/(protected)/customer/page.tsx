@@ -233,6 +233,13 @@ export default function Customer() {
                 Copy Email
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {rowdata.credit.allowed && (
+                <DropdownMenuItem className="bg-green-400 text-white mt-2">
+                  <Link href={`customer/addCredit/${rowdata.docId}`}>
+                    Add Paid Credit
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="bg-blue-400 text-white mt-2">
                 <Link href={`customer/editCustomer/${rowdata.docId}`}>
                   Edit Details

@@ -2,10 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
-type Props = {
-  timeLabel: "This Week" | "This Month" | "This Year";
-};
-
 function getMonday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
@@ -29,7 +25,9 @@ function getFirstDayOfTheYear(d: Date) {
   let firstyear = new Date(date_today.getFullYear(), 0, 1).toISOString();
   return firstyear;
 }
-
+type Props = {
+  timeLabel: "This Week" | "This Month" | "This Year";
+};
 export default function TotalCard({ timeLabel }: Props) {
   const [data, setData] = useState<any | null>();
 
@@ -57,7 +55,7 @@ export default function TotalCard({ timeLabel }: Props) {
         console.log(datas);
         setData(datas);
       });
-  }, []);
+  }, [timeLabel]);
 
   if (!data) return null;
 

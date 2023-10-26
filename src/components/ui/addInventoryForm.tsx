@@ -154,9 +154,9 @@ export default function AddInventoryForm({
         <div className="mb-4">
           <div className="mb-2">Inventory History:</div>
           <div className="flex flex-col gap-2">
-            {inventory?.history.map((h) => {
+            {inventory?.history.map((h, i) => {
               return (
-                <Card className="mb-4">
+                <Card key={i} className="mb-4">
                   <CardContent className="flex p-4 gap-4">
                     <div className="flex flex-wrap w-full items-center justify-between">
                       <div className="flex gap-2">

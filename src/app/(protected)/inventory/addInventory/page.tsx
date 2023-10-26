@@ -13,7 +13,7 @@ type Product = {
   unit_price: string;
   product_name: string;
 };
-export default async function page() {
+export default function AddInventory() {
   const { products } = useTodo();
   return (
     <div className="flex items-center justify-center h-full w-full py-24">

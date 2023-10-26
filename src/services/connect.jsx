@@ -176,6 +176,22 @@ const services = {
       return undefined;
     }
   },
+  addCredit: async (newCredit, customerId) => {
+    const createdref = doc(db, "Customers", customerId);
+    try {
+      await setDoc(
+        createdref,
+        {
+          credit: newCredit,
+        },
+        { merge: true }
+      );
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  },
   EditProduct: async (product, productId) => {
     const createdref = doc(db, "Products", productId);
     try {

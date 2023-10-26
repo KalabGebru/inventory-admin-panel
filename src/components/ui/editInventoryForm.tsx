@@ -137,7 +137,9 @@ export default function EditInventoryForm({
           <div className="mb-2">Inventory History:</div>
           <div className="flex flex-col gap-2">
             {history.map((h, i) => {
-              return <EditHistory his={h} func={setHistory} index={i} />;
+              return (
+                <EditHistory key={i} his={h} func={setHistory} index={i} />
+              );
             })}
           </div>
         </div>

@@ -19,7 +19,7 @@ type Props = {
   };
 };
 
-export default async function page({ params }: Props) {
+export default function EditUser({ params }: Props) {
   console.log(params.userId);
   const { users } = useTodo();
 

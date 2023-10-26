@@ -19,7 +19,7 @@ type Props = {
     productId: string;
   };
 };
-export default async function page({ params }: Props) {
+export default function EditProduct({ params }: Props) {
   console.log(params.productId);
   const { products } = useTodo();
 

@@ -273,6 +273,9 @@ export default function AddCustomerForm({
                   value={max}
                   onChange={(e) => setMax(Number(e.target.value))}
                 />
+                <div className="text-gray-400">
+                  If left 0 then the customer will have no credit limit
+                </div>
               </div>
               <div className="flex flex-col gap-2 w-full xl:w-96">
                 <label htmlFor="max">Credit Used by The Customer</label>

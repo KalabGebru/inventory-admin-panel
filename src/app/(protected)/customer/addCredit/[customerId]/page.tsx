@@ -1,5 +1,5 @@
 "use client";
-import AddCustomerForm from "@/components/ui/addCustomerForm";
+import AddCreditForm from "@/components/ui/addCreditForm";
 import { useTodo } from "@/hooks/useContextData";
 
 type Customer = {
@@ -19,23 +19,22 @@ type Props = {
     customerId: string;
   };
 };
-export default function EditCustomer({ params }: Props) {
+export default function AddCredit({ params }: Props) {
   console.log(params.customerId);
   const { customer } = useTodo();
 
-  const userData = customer.find((c: Customer) => c.docId == params.customerId);
+  const customerData = customer.find(
+    (i: Customer) => i.docId == params.customerId
+  );
 
-  console.log(userData);
+  if (!customerData) return <div className="">No customer by that ID</div>;
 
-  if (!userData) return null;
+  if (!customerData.credit.allowed)
+    return <div className="">{`this customer doesn't use credit`}</div>;
 
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <AddCustomerForm
-        defaultValue={userData}
-        editMode={true}
-        docId={params.customerId}
-      />
+      <AddCreditForm customer={customerData} />
     </div>
   );
 }

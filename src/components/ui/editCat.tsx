@@ -29,7 +29,7 @@ export default function EditCat({ cat, func, catId }: Props) {
         return g;
       });
     });
-  }, [value]);
+  }, [value, func, catId]);
 
   return (
     <Card className="mb-4">

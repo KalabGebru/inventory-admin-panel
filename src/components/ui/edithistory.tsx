@@ -24,7 +24,7 @@ export default function EditHistory({ his, func, index }: Props) {
         return g;
       });
     });
-  }, [value]);
+  }, [value, func, index]);
   return (
     <Card className="mb-4">
       <CardContent className="flex p-4 gap-4">

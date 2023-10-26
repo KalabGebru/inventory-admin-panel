@@ -1,10 +1,5 @@
 import services from "@/services/connect";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 export const POST = async (request) => {
   const { paidIn, discounted, customer, totalAmount, items, salesId } =
     await request.json();

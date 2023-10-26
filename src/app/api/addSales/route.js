@@ -4,11 +4,6 @@ import { writeFile } from "fs/promises";
 import { join } from "path";
 import dynamic from "next/dynamic";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 export const POST = async (request) => {
   const { paidIn, discounted, customer, totalAmount, items } =
     await request.json();

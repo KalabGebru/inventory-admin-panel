@@ -1,28 +1,21 @@
 import services from "@/services/connect";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 export const POST = async (request) => {
   // const form = formidable();
-  const data = await request.formData();
-  console.log(data);
+  const { id, image, details, catagory, unit_price, product_name, docId } =
+    await request.json();
 
   // const file = data.get("file");
-  const docId = data.get("docId");
   const newProduct = {
-    id: data.get("id"),
-    image: data.get("image"),
-    details: data.get("details"),
-    catagory: data.get("catagory"),
-    unit_price: `$${data.get("unit_price")}`,
-    product_name: data.get("product_name"),
+    id,
+    image,
+    details,
+    catagory,
+    unit_price,
+    product_name,
     datetime: new Date().toISOString(),
   };
-
-  console.log(newProduct);
+  console.log(newProduct, docId);
 
   try {
     const Allproducts = await services.GetAllProducts();

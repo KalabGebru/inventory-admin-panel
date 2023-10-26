@@ -28,7 +28,7 @@ type User = {
   docId: string;
   datetime: string;
 };
-export default function page() {
+export default function Users() {
   const { users, setUsers } = useTodo();
 
   console.log(users);

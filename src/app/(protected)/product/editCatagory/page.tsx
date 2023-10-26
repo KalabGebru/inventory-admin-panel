@@ -8,7 +8,7 @@ type Cat = {
   docId: string;
 };
 
-export default async function page() {
+export default function EditCatagory() {
   const { catagory } = useTodo();
 
   if (!catagory) return <div className="">no catagories was found</div>;

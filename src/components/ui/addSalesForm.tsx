@@ -210,7 +210,11 @@ export default function AddSalesForm() {
                 {selectedCustomer.credit.allowed && (
                   <div className="">
                     <span className="bg-gray-400 p-1 rounded">Credit:</span>
-                    {` ${selectedCustomer.credit.max}-${selectedCustomer.credit.used}`}
+                    {` ${
+                      customer.credit.max == 0
+                        ? "No Limit"
+                        : customer.credit.max
+                    }-${customer.credit.used}`}
                   </div>
                 )}
               </CardContent>
@@ -233,7 +237,7 @@ export default function AddSalesForm() {
         {items.length !== 0 ? (
           items.map((item: Items) => {
             return (
-              <Card className="w-full max-w-xl">
+              <Card key={item.productId} className="w-full max-w-xl">
                 <CardContent className="p-4">
                   <div className="flex gap-4">
                     <Image

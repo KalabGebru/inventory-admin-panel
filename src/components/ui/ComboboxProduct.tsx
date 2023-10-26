@@ -146,13 +146,26 @@ export function ComboboxProduct({ list, setItems, defultValue }: Props) {
             arr.push(product);
             setValue(arr);
           }
-          addproduct();
+          setItems((pre: any) => {
+            return value.map((v: Product) => {
+              const exist = pre.find((p: any) => p?.productId === v?.docId);
+              if (exist) {
+                return {
+                  productId: v.docId,
+                  product: exist.product,
+                  no: exist.no,
+                };
+              } else {
+                return { productId: v.docId, product: v, no: 1 };
+              }
+            });
+          });
         } else {
           toast.error(`No product with "${pestedValue}" ID`);
         }
       }
     }
-  }, [pestedValue]);
+  }, [pestedValue, list, setItems, value]);
 
   return (
     <div className="flex flex-col gap-4">

@@ -18,8 +18,8 @@ type Props = {
   };
 };
 
-export default async function page({ params }: Props) {
-  const { users, setUsers } = useTodo();
+export default function ProfilePage({ params }: Props) {
+  const { users } = useTodo();
 
   const username = params.user.replace("%20", " ");
   console.log(username);

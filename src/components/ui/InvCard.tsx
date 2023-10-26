@@ -29,7 +29,7 @@ export default function InvCard({ no, Labal }: Props) {
         console.log(data);
         setData(data);
       });
-  }, []);
+  }, [no]);
 
   if (!data) return null;
 

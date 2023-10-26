@@ -82,9 +82,8 @@ export default function AddProductForm({
   docId,
 }: Props) {
   // const [file, setfile] = useState<File>();
-  const { setProducts, setProductsLoading } = useTodo();
+  const { catagory, setProducts, setProductsLoading } = useTodo();
   const [sending, setSending] = useState(false);
-  const [catagorys, setCatagorys] = useState([]);
   const [image, setImage] = useState(
     editMode ? { image: defaultValue?.image } : { image: "" }
   );
@@ -107,14 +106,6 @@ export default function AddProductForm({
   const router = useRouter();
   const formData = new FormData();
 
-  useEffect(() => {
-    const res = fetch("/api/getCatagorys")
-      .then((response) => response.json())
-      .then((data) => {
-        setCatagorys(data.result);
-      });
-  }, []);
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -128,29 +119,27 @@ export default function AddProductForm({
     },
   });
 
-  function objectToFormData(obj: object) {
-    Object.entries(obj).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-  }
-
   async function AddEditProduct(data: z.infer<typeof FormSchema>) {
-    objectToFormData(data);
-    if (image.image) {
-      formData.append("image", image.image);
-    }
-
     let res;
     if (editMode && docId) {
-      formData.append("docId", docId);
+      const newData = {
+        ...data,
+        image: image.image,
+        docId: docId,
+      };
+
       res = await fetch("/api/editProduct", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify(newData),
       });
     } else {
+      const newData = {
+        ...data,
+        image: image.image,
+      };
       res = await fetch("/api/addProduct", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify(newData),
       });
     }
 
@@ -188,7 +177,7 @@ export default function AddProductForm({
     });
   }
 
-  if (!catagorys) return null;
+  if (!catagory) return null;
   return (
     <div className="w-full max-w-5xl p-8 border rounded-md m-4">
       <div className="text-xl mb-8">Add a Product</div>
@@ -246,8 +235,8 @@ export default function AddProductForm({
                           <SelectValue placeholder="Catagory" />
                         </SelectTrigger>
                         <SelectContent>
-                          {catagorys.map((cat: cat) => (
-                            <SelectItem value={cat.catagoryName}>
+                          {catagory.map((cat: cat) => (
+                            <SelectItem key={cat.docId} value={cat.docId}>
                               {cat.catagoryName}
                             </SelectItem>
                           ))}

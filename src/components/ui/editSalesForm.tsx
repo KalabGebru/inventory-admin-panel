@@ -286,7 +286,7 @@ export default function EditSalesForm({ customers, product, sales }: Props) {
         {items.length !== 0 ? (
           items.map((item: Items) => {
             return (
-              <Card className="w-full max-w-xl">
+              <Card key={item.productId} className="w-full max-w-xl">
                 <CardContent className="p-4">
                   <div className="flex gap-4">
                     <Image

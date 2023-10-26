@@ -131,7 +131,7 @@ export default function BarChartData({ Labal }: Props) {
         console.log(data);
         setData(data);
       });
-  }, [filterDate]);
+  }, [filterDate, Labal]);
 
   if (!data) return null;
 

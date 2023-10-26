@@ -20,7 +20,7 @@ type Props = {
   };
 };
 
-export default async function page({ params }: Props) {
+export default function EditSales({ params }: Props) {
   const { products, customer, sales } = useTodo();
 
   const salesData = sales.find((s: Sales) => s.docId == params.salesId);

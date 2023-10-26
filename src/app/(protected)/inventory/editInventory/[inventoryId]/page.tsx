@@ -27,7 +27,7 @@ type Props = {
     inventoryId: string;
   };
 };
-export default async function page({ params }: Props) {
+export default function EditInventory({ params }: Props) {
   console.log(params.inventoryId);
   const { inventory, products } = useTodo();
 

@@ -1,6 +1,6 @@
+"use client";
 import AddInventoryForm from "@/components/ui/addInventoryForm";
 import { useTodo } from "@/hooks/useContextData";
-import services from "@/services/connect";
 
 type Inventory = {
   productId: string;
@@ -27,7 +27,7 @@ type Props = {
     inventoryId: string;
   };
 };
-export default async function page({ params }: Props) {
+export default function AddInventoryID({ params }: Props) {
   console.log(params.inventoryId);
   const { inventory, products } = useTodo();
 
