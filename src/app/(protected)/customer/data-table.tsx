@@ -164,10 +164,10 @@ export function CustomerDataTable<TData, TValue>({
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
-                .map((column) => {
+                .map((column, i) => {
                   return (
                     <DropdownMenuCheckboxItem
-                      key={column.id}
+                      key={i}
                       className="capitalize"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
@@ -214,7 +214,7 @@ export function CustomerDataTable<TData, TValue>({
                   <LoadingSpinner />
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows?.length ? (
+            ) : table?.getRowModel()?.rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

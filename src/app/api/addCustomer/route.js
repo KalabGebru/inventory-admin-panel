@@ -15,7 +15,6 @@ export const POST = async (request) => {
 
   try {
     const newCustomer = {
-      id: 101,
       credit: {
         allowed: allowed,
         max: Number(max),

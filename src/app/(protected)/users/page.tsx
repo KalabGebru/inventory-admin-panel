@@ -33,14 +33,16 @@ export default function Users() {
 
   console.log(users);
 
-  function fetchUsersdata() {
-    fetch("/api/getUsers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setUsers(data.Users);
-      })
-      .catch((err) => console.log(err));
+  function fetchUsersdata(id: string) {
+    // fetch("/api/getUsers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setUsers(data.Users);
+    //   })
+    //   .catch((err) => console.log(err));
+    const newUsers = users.filter((User: User) => User.docId != id);
+    setUsers(newUsers);
   }
 
   if (!users) return null;
@@ -66,7 +68,7 @@ export default function Users() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.success);
-      if (response.success) fetchUsersdata();
+      if (response.success) fetchUsersdata(id);
       return response.success;
     }
     throw Error;

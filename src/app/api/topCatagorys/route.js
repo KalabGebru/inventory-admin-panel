@@ -34,7 +34,7 @@ export const POST = async (request) => {
 
     productData.forEach((item) => {
       productD[item.docId] = {
-        price: Number(item.unit_price.replace(/[^0-9.-]+/g, "")),
+        price: item.unit_price,
         catagory: item.catagory,
       };
     });

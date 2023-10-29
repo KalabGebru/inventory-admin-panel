@@ -45,28 +45,40 @@ const FormSchema = z.object({
 });
 
 export function AddUsers() {
-  const { setUsers, setUsersLoading } = useTodo();
+  const { users, setUsers, setUsersLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
   const router = useRouter();
+  console.log(users);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  function fetchUsersdata() {
-    setUsersLoading(true);
-    fetch("/api/getUsers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setUsers(data.Users);
-        setUsersLoading(false);
-      })
-      .catch((err) => {
-        setUsersLoading(false);
-        console.log(err);
-      });
+  function fetchUsersdata(id: string, newData: any) {
+    // setUsersLoading(true);
+    // fetch("/api/getUsers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setUsers(data.Users);
+    //     setUsersLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setUsersLoading(false);
+    //     console.log(err);
+    //   });
+    const newUsers = [
+      ...users,
+      {
+        docId: id,
+        ...newData,
+        password: "",
+        image: "",
+        datetime: new Date().toISOString(),
+      },
+    ];
+    setUsers(newUsers);
   }
 
   async function AddUser(data: z.infer<typeof FormSchema>) {
@@ -90,7 +102,7 @@ export function AddUsers() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchUsersdata();
+      fetchUsersdata(response.result, data);
       router.push(`/users/`);
       return response.result;
     }
@@ -201,6 +213,7 @@ export function AddUsers() {
                     <SelectContent>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="sales">Sales</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

@@ -28,7 +28,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -77,8 +77,8 @@ export function ComboboxInventory({ list, setProduct }: Props) {
         <PopoverContent className="w-96 p-0">
           <ScrollArea className="h-96 w-96 rounded-md border">
             <Command>
-              <CommandInput placeholder="Search framework..." />
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandInput placeholder="Search Product..." />
+              <CommandEmpty>No Product found.</CommandEmpty>
               <CommandGroup>
                 {FW.map((framework) => (
                   <CommandItem
@@ -103,7 +103,7 @@ export function ComboboxInventory({ list, setProduct }: Props) {
                           alt={framework.label}
                           width={50}
                           height={100}
-                          className="w-full h-full bg-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="">

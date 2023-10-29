@@ -10,7 +10,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 export default function AddInventory() {

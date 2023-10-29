@@ -1,11 +1,7 @@
 import services from "@/services/connect";
-import formidable from "formidable";
-import { writeFile } from "fs/promises";
-import { join } from "path";
-import dynamic from "next/dynamic";
 
 export const POST = async (request) => {
-  const { paidIn, discounted, customer, totalAmount, items } =
+  const { paidIn, discounted, customer, totalAmount, items, creditAmount } =
     await request.json();
 
   console.log(items);
@@ -39,6 +35,7 @@ export const POST = async (request) => {
       customer: customer,
       discounted: discounted,
       totalAmount: totalAmount,
+      creditedAmount: creditAmount,
       paidIn: paidIn,
       items: items,
       datetime: new Date().toISOString(),
@@ -53,7 +50,7 @@ export const POST = async (request) => {
       const history = cu.history;
       console.log(history);
       if (paidIn == "credit") {
-        const used = cu.credit.used + totalAmount;
+        const used = cu.credit.used + creditAmount;
         cuData = {
           history: [...history, created],
           credit: { ...cu.credit, used: used },

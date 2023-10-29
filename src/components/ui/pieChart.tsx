@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./select";
+import { useTodo } from "@/hooks/useContextData";
 
 // const data = [
 //   {
@@ -95,27 +96,46 @@ function getFirstDayOfTheYear(d: Date) {
   return firstyear;
 }
 
-export default function PieChartData() {
+type Props = {
+  Labal: "Catagory" | "Customer";
+};
+
+export default function PieChartData({ Labal }: Props) {
   const [data, setData] = useState<any | null>();
-  const [filterDate, setFilterDate] = useState("thisMonth");
+  const { catagory } = useTodo();
+  const [filterDate, setFilterDate] = useState("thisWeek");
+
+  console.log("g");
+
+  const path = Labal == "Catagory" ? "topCatagorys" : "selesCustomerVs";
+
+  const now = new Date();
+  now.setDate(now.getDate() + 1);
+  const nowPlusone = now.toISOString().slice(0, 10);
+  console.log(nowPlusone, now);
 
   useEffect(() => {
-    const now = new Date();
-    now.setDate(now.getDate() + 1);
-    const nowPlusone = now.toISOString().slice(0, 10);
-    console.log(nowPlusone, now);
+    console.log("g");
     const Data =
       filterDate == "thisWeek"
         ? {
             min: getMonday(new Date()),
             max: nowPlusone,
-            No: 5,
+            No: catagory.length ? catagory.length : 2,
           }
         : filterDate == "thisMonth"
-        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: 5 }
-        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: 5 };
+        ? {
+            min: getFirstDayOfTheMonth(new Date()),
+            max: nowPlusone,
+            No: catagory.length ? catagory.length : 2,
+          }
+        : {
+            min: getFirstDayOfTheYear(new Date()),
+            max: nowPlusone,
+            No: catagory.length ? catagory.length : 2,
+          };
 
-    const res = fetch(`/api/selesCustomerVs`, {
+    const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
     })
@@ -128,9 +148,23 @@ export default function PieChartData() {
 
   if (!data) return null;
 
-  const dd = data.result.Customer;
+  let dd;
+
+  if (Labal == "Catagory") {
+    const catagoryResults = data.result.topByNo.map((cat: any) => {
+      return {
+        ...cat,
+        catagoryName: catagory.find((c: any) => c.docId == cat.catagory)
+          .catagoryName,
+      };
+    });
+    dd = catagoryResults;
+  } else {
+    dd = data.result.Customer;
+  }
+
   // const ddd = data.result.topByPrice;
-  const COLORS = ["#0088FE", "#00C49F"];
+  const COLORS = ["#0088FE", "#FFBB28", "#00C49F", "#FF8042"];
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({
     cx,
@@ -193,7 +227,9 @@ export default function PieChartData() {
                 <Pie
                   data={dd}
                   dataKey="no"
-                  nameKey="customerType"
+                  nameKey={
+                    Labal == "Catagory" ? "catagoryName" : "customerType"
+                  }
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
@@ -202,7 +238,10 @@ export default function PieChartData() {
                   label={renderCustomizedLabel}
                 >
                   {dd.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index]}></Cell>
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    ></Cell>
                   ))}
                 </Pie>
               </PieChart>
@@ -221,7 +260,9 @@ export default function PieChartData() {
                 <Pie
                   data={dd}
                   dataKey="price"
-                  nameKey="customerType"
+                  nameKey={
+                    Labal == "Catagory" ? "catagoryName" : "customerType"
+                  }
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
@@ -230,7 +271,10 @@ export default function PieChartData() {
                   label={renderCustomizedLabel}
                 >
                   {dd.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </PieChart>

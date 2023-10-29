@@ -98,18 +98,19 @@ export default function BarChartData({ Labal }: Props) {
   const [data, setData] = useState<any | null>();
   const [filterDate, setFilterDate] = useState("thisMonth");
 
-  useEffect(() => {
-    const path =
-      Labal == "Top Catagory"
-        ? "topCatagorys"
-        : Labal == "Top Product"
-        ? "topProducts"
-        : "topCustomers";
+  const path =
+    Labal == "Top Catagory"
+      ? "topCatagorys"
+      : Labal == "Top Product"
+      ? "topProducts"
+      : "topCustomers";
 
-    const now = new Date();
-    now.setDate(now.getDate() + 1);
-    const nowPlusone = now.toISOString().slice(0, 10);
-    console.log(nowPlusone, now);
+  const now = new Date();
+  now.setDate(now.getDate() + 1);
+  const nowPlusone = now.toISOString().slice(0, 10);
+  console.log(nowPlusone, now);
+
+  useEffect(() => {
     const Data =
       filterDate == "thisWeek"
         ? {
@@ -131,7 +132,7 @@ export default function BarChartData({ Labal }: Props) {
         console.log(data);
         setData(data);
       });
-  }, [filterDate, Labal]);
+  }, [filterDate]);
 
   if (!data) return null;
 

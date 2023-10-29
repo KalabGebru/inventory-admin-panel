@@ -18,7 +18,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -111,7 +111,7 @@ export default function EditInventoryForm({
               alt={product.product_name}
               width={250}
               height={300}
-              className="h-full w-full bg-cover"
+              className="h-full w-full object-cover"
             />
           </div>
           <div className="">

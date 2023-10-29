@@ -81,8 +81,10 @@ export default function AddCustomerForm({
   editMode,
   docId,
 }: Props) {
-  const { setCustomer, setCustomerLoading } = useTodo();
-  const [allowed, setAllowed] = useState(false);
+  const { customer, setCustomer, setCustomerLoading } = useTodo();
+  const [allowed, setAllowed] = useState(
+    editMode ? defaultValue?.credit.allowed : false
+  );
   const [sending, setSending] = useState(false);
   const [max, setMax] = useState(editMode ? defaultValue?.credit.max : 0);
   const [used, setUsed] = useState(editMode ? defaultValue?.credit.used : 0);
@@ -103,25 +105,70 @@ export default function AddCustomerForm({
     },
   });
 
-  function fetchCustomerdata() {
-    setCustomerLoading(true);
-    fetch("/api/getCustomers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setCustomer(data.Customers);
-        setCustomerLoading(false);
-      })
-      .catch((err) => {
-        setCustomerLoading(undefined);
-        console.log(err);
+  function fetchCustomerdata(id: string, newData: any) {
+    // setCustomerLoading(true);
+    // fetch("/api/getCustomers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setCustomer(data.Customers);
+    //     setCustomerLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setCustomerLoading(undefined);
+    //     console.log(err);
+    //   });
+    let newCustomer;
+    if (editMode) {
+      newCustomer = customer.map((Cu: Customer) => {
+        if (Cu.docId == newData.docId) {
+          const editedCustomer = {
+            ...Cu,
+            email: newData.email,
+            first_name: newData.first_name,
+            last_name: newData.last_name,
+            gender: newData.gender,
+            phone_number: newData.phone_number,
+            credit: {
+              allowed: newData.allowed,
+              max: Number(newData.max),
+              used: Number(newData.used),
+            },
+            discount: Number(newData.discount),
+          };
+
+          return editedCustomer;
+        }
+        return Cu;
       });
+
+      setCustomer(newCustomer);
+    } else {
+      const createdCustomer = {
+        docId: id,
+        credit: {
+          allowed: newData.allowed,
+          max: Number(newData.max),
+          used: Number(newData.used),
+        },
+        email: newData.email,
+        first_name: newData.first_name,
+        last_name: newData.last_name,
+        gender: newData.gender,
+        phone_number: newData.phone_number,
+        discount: Number(newData.discount),
+        history: [],
+      };
+      newCustomer = [...customer, createdCustomer];
+      setCustomer(newCustomer);
+    }
   }
 
   async function AddEditCustomer(data: z.infer<typeof FormSchema>) {
     let res;
+    let newData;
     if (editMode && docId) {
-      const newData = {
+      newData = {
         ...data,
         allowed: allowed,
         max: max,
@@ -133,7 +180,7 @@ export default function AddCustomerForm({
         body: JSON.stringify(newData),
       });
     } else {
-      const newData = {
+      newData = {
         ...data,
         allowed: allowed,
         max: max,
@@ -149,7 +196,7 @@ export default function AddCustomerForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchCustomerdata();
+      fetchCustomerdata(response.result, newData);
       router.push(`/customer/`);
       return response.result;
     }
@@ -238,11 +285,17 @@ export default function AddCustomerForm({
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Phone Number"
-                        {...field}
-                      />
+                      <div className="flex items-center">
+                        <div className="flex items-center justify-center border rounded-l-md h-10 pl-4 pr-1 bg-gray-500/20">
+                          <span>251+</span>
+                        </div>
+                        <Input
+                          type="number"
+                          placeholder="Phone Number"
+                          {...field}
+                          className=" rounded-l-none border-l-0"
+                        />
+                      </div>
                     </FormControl>
                     {/* <FormDescription>Input your user password.</FormDescription> */}
                     <FormMessage />

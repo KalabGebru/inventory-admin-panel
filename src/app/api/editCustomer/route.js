@@ -16,7 +16,6 @@ export const POST = async (request) => {
 
   try {
     const newCustomer = {
-      id: 101,
       credit: {
         allowed: allowed,
         max: Number(max),
@@ -28,7 +27,6 @@ export const POST = async (request) => {
       gender,
       phone_number,
       discount: Number(discount),
-      history: [],
     };
     console.log(newCustomer);
     const newCustomerId = await services.EditCustomer(newCustomer, docId);

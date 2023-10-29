@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import { useTodo } from "@/hooks/useContextData";
 
 type Props = {
   no: number;
@@ -34,23 +35,24 @@ function getFirstDayOfTheYear(d: Date) {
 
 export default function TopCard({ no, path, timeLabel }: Props) {
   const [data, setData] = useState<any | null>();
+  const { sales } = useTodo();
+
+  const now = new Date();
+  now.setDate(now.getDate() + 1);
+  const nowPlusone = now.toISOString().slice(0, 10);
+  console.log(nowPlusone, now);
+  const Data =
+    timeLabel == "This Week"
+      ? {
+          min: getMonday(new Date()),
+          max: nowPlusone,
+          No: no,
+        }
+      : timeLabel == "This Month"
+      ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: no }
+      : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: no };
 
   useEffect(() => {
-    const now = new Date();
-    now.setDate(now.getDate() + 1);
-    const nowPlusone = now.toISOString().slice(0, 10);
-    console.log(nowPlusone, now);
-    const Data =
-      timeLabel == "This Week"
-        ? {
-            min: getMonday(new Date()),
-            max: nowPlusone,
-            No: no,
-          }
-        : timeLabel == "This Month"
-        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: no }
-        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: no };
-
     const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
@@ -60,7 +62,7 @@ export default function TopCard({ no, path, timeLabel }: Props) {
         console.log(data);
         setData(data);
       });
-  }, [no, path, timeLabel]);
+  }, [sales]);
 
   if (
     !data ||
@@ -72,7 +74,9 @@ export default function TopCard({ no, path, timeLabel }: Props) {
     <div className="border rounded-md p-6 min-w-[300px]">
       <Tabs defaultValue="byNo" className="">
         <div className="flex items-center justify-between gap-8">
-          <span className={`border-2 text-sm rounded-md py-1 px-2 bg-blue-400`}>
+          <span
+            className={`border-2 text-sm rounded-md py-1 px-2 bg-gray-400/20`}
+          >
             {timeLabel}
           </span>
           <TabsList className="grid grid-cols-2 w-40">
@@ -86,24 +90,30 @@ export default function TopCard({ no, path, timeLabel }: Props) {
               <div className="flex justify-between items-center gap-2">
                 <h1 className="font-bold text-xl">Top Product</h1>
               </div>
-              <span className="text-xl">
+              <span className="text-xl opacity-50">
                 {data.result.topByNo[0]?.product_name &&
                   data.result.topByNo[0]?.product_name}
                 {data.result.topByNo[0]?.first_name &&
                   `${data.result.topByNo[0]?.first_name} ${data.result.topByNo[0]?.last_name}`}
+                {data.result.topByNo[0]?.customerId == "XXXX" &&
+                  `Unregistered Customer`}
               </span>
             </div>
             <h2 className="text-2xl">
-              No of Items : {data.result.topByNo[0]?.no}
+              No of Items : {data.result.topByNo[0]?.no.toLocaleString("en-US")}
             </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result.topByNo[0]?.no}</span>
+                <span className="">
+                  {data.result.topByNo[0]?.no.toLocaleString("en-US")}
+                </span>
                 <span className="">Items Bought this week</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result.topByNo[0]?.price}</span>
+                <span className="">
+                  {data.result.topByNo[0]?.price.toLocaleString("en-US")}
+                </span>
               </h3>
             </div>
           </div>
@@ -114,24 +124,31 @@ export default function TopCard({ no, path, timeLabel }: Props) {
               <div className="flex justify-between items-center gap-2">
                 <h1 className="font-bold text-xl">Top Product</h1>
               </div>
-              <span className="text-xl">
+              <span className="text-xl opacity-50">
                 {data.result.topByPrice[0]?.product_name &&
                   data.result.topByPrice[0]?.product_name}
                 {data.result.topByPrice[0]?.first_name &&
                   `${data.result.topByPrice[0]?.first_name} ${data.result.topByPrice[0]?.last_name}`}
+                {data.result.topByNo[0]?.customerId == "XXXX" &&
+                  `Unregistered Customer`}
               </span>
             </div>
             <h2 className="text-2xl">
-              Price : {data.result.topByPrice[0]?.price}
+              Price : {data.result.topByPrice[0]?.price.toLocaleString("en-US")}{" "}
+              ETB
             </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result.topByPrice[0]?.no}</span>
+                <span className="">
+                  {data.result.topByPrice[0]?.no.toLocaleString("en-US")}
+                </span>
                 <span className="">Items Bought this week</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">{data.result.topByPrice[0]?.price}</span>
+                <span className="">
+                  {data.result.topByPrice[0]?.price.toLocaleString("en-US")} ETB
+                </span>
               </h3>
             </div>
           </div>

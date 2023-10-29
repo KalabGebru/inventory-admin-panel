@@ -26,16 +26,21 @@ export const POST = async (request) => {
 
     console.log(filteredSales);
 
-    let sum = 0;
+    let No = 0;
+    let Price = 0;
 
     filteredSales.forEach((item) => {
-      sum = sum + item.totalAmount;
+      Price = Price + item.totalAmount;
+      item.items.forEach((item) => {
+        No = No + item.no;
+      });
     });
 
     return new Response(
       JSON.stringify({
         result: {
-          sum: sum,
+          Price: Price,
+          No: No,
         },
       }),
       {

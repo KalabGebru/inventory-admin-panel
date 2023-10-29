@@ -88,6 +88,10 @@ export default function RenderLineChart() {
     return `${value.substring(0, limit)}`;
   };
 
+  const tickFormatter2 = (value: string, index: number) => {
+    return `${Number(value).toLocaleString("en-US")} ETB`;
+  };
+
   return (
     <div className="border rounded-lg p-4">
       <Tabs defaultValue="Week" className="">
@@ -129,10 +133,26 @@ export default function RenderLineChart() {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis
+                  dataKey="name"
+                  height={50}
+                  label={{
+                    value: "Date",
+                    angle: 0,
+                    position: "insideBottom",
+                  }}
+                />
+                <YAxis
+                  width={120}
+                  tickFormatter={tickFormatter2}
+                  label={{
+                    value: "Price of Products",
+                    angle: -90,
+                    position: "left",
+                  }}
+                />
                 <Tooltip />
-                <Legend />
+                {/* <Legend /> */}
                 {/* <Line
             type="monotone"
             dataKey="pv"
@@ -163,16 +183,23 @@ export default function RenderLineChart() {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
-                  height={50}
                   dataKey="name"
-                  // tickFormatter={tickFormatter}
+                  height={50}
                   label={{
-                    value: `${month[0].name.slice(3, 7)}`,
+                    value: `Current Month`,
                     angle: 0,
                     position: "insideBottom",
                   }}
                 />
-                <YAxis />
+                <YAxis
+                  width={120}
+                  tickFormatter={tickFormatter2}
+                  label={{
+                    value: "Price of Products",
+                    angle: -90,
+                    position: "left",
+                  }}
+                />
                 <Tooltip />
                 <Legend />
                 <Line
@@ -204,8 +231,24 @@ export default function RenderLineChart() {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tickFormatter={tickFormatter} />
-                <YAxis />
+                <XAxis
+                  dataKey="name"
+                  height={50}
+                  label={{
+                    value: `Months`,
+                    angle: 0,
+                    position: "insideBottom",
+                  }}
+                />
+                <YAxis
+                  width={120}
+                  tickFormatter={tickFormatter2}
+                  label={{
+                    value: "Price of Products",
+                    angle: -90,
+                    position: "left",
+                  }}
+                />
                 <Tooltip />
                 <Legend />
                 {/* <Line

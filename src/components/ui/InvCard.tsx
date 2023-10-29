@@ -39,7 +39,9 @@ export default function InvCard({ no, Labal }: Props) {
     <div className="border rounded-md p-6 min-w-[300px]">
       <Tabs defaultValue="byNo" className="">
         <div className="flex items-center justify-between gap-8">
-          <span className={`border-2 text-sm rounded-md py-1 px-2 bg-blue-400`}>
+          <span
+            className={`border-2 text-sm rounded-md py-1 px-2 bg-gray-400/20`}
+          >
             {Labal}
           </span>
           <TabsList className="grid grid-cols-2 w-40">
@@ -57,7 +59,7 @@ export default function InvCard({ no, Labal }: Props) {
                   <h1 className="font-bold text-xl">Top Catagory</h1>
                 )}
               </div>
-              <span className="text-xl">
+              <span className="text-xl opacity-50">
                 {Labal == "Catagory"
                   ? catagory.find(
                       (c: any) => c.docId === data.result[type][0].catagory
@@ -66,16 +68,20 @@ export default function InvCard({ no, Labal }: Props) {
               </span>
             </div>
             <h2 className="text-2xl">
-              No of Items : {data.result[type][0].no}
+              No of Items : {data.result[type][0].no.toLocaleString("en-US")}
             </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result[type][0].no}</span>
+                <span className="">
+                  {data.result[type][0].no.toLocaleString("en-US")}
+                </span>
                 <span className="">Items In the Inventory</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">${data.result[type][0].price}</span>
+                <span className="">
+                  {data.result[type][0].price.toLocaleString("en-US")} ETB
+                </span>
               </h3>
             </div>
           </div>
@@ -98,15 +104,21 @@ export default function InvCard({ no, Labal }: Props) {
                   : data.result[type][0].product_name}
               </span>
             </div>
-            <h2 className="text-2xl">Price : {data.result[typeC][0].price}</h2>
+            <h2 className="text-2xl">
+              Price : {data.result[typeC][0].price.toLocaleString("en-US")} ETB
+            </h2>
             <div className="">
               <h3 className="flex gap-2">
-                <span className="">{data.result[typeC][0].no}</span>
+                <span className="">
+                  {data.result[typeC][0].no.toLocaleString("en-US")}
+                </span>
                 <span className="">Items In the Inventory</span>{" "}
               </h3>
               <h3 className="flex gap-2">
                 <span className="">In Total </span>
-                <span className="">${data.result[typeC][0].price}</span>
+                <span className="">
+                  {data.result[typeC][0].price.toLocaleString("en-US")} ETB
+                </span>
               </h3>
             </div>
           </div>

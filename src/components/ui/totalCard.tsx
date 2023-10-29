@@ -61,41 +61,32 @@ export default function TotalCard({ timeLabel }: Props) {
 
   return (
     <div className="border rounded-md p-6 min-w-[300px]">
-      <Tabs defaultValue="byNo" className="">
-        <div className="flex items-center justify-between gap-8">
-          <span className={`border-2 text-sm rounded-md py-1 px-2 bg-blue-400`}>
-            {timeLabel}
-          </span>
-          <TabsList className="grid grid-cols-2 w-40">
-            <TabsTrigger value="byNo">By No</TabsTrigger>
-            <TabsTrigger value="byPrice">By Price</TabsTrigger>
-          </TabsList>
+      <div className="flex items-center justify-between mb-4">
+        <span
+          className={`border-2 text-sm rounded-md py-1 px-2 bg-gray-400/50`}
+        >
+          {timeLabel}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center gap-2">
+            <h1 className="font-semibold text-xl">Total Sales ${timeLabel}</h1>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xl">
+              Items Sold:{" "}
+              {data.result.No && data.result.No.toLocaleString("en-US")}
+            </span>
+            <span className="text-xl">
+              Total Price:{" "}
+              {data.result.Price && data.result.Price.toLocaleString("en-US")}{" "}
+              ETB
+            </span>
+          </div>
         </div>
-        <TabsContent value="byNo">
-          <div className="flex flex-col gap-2">
-            <div className="">
-              <div className="flex justify-between items-center gap-2">
-                <h1 className="font-bold text-xl">Top Product</h1>
-              </div>
-              <span className="text-2xl">
-                Items: {data.result.sum && data.result.sum}
-              </span>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="byPrice">
-          <div className="flex flex-col gap-2">
-            <div className="">
-              <div className="flex justify-between items-center gap-2">
-                <h1 className="font-bold text-xl">Top Product</h1>
-              </div>
-              <span className="text-2xl">
-                Price: {data.result.sum && data.result.sum}
-              </span>
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   );
 }

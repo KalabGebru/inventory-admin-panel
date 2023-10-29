@@ -93,23 +93,51 @@ export function ProductDataTable<TData, TValue>({
   }
 
   useEffect(() => {
-    setColumnFilters((pre) => [
-      ...pre,
-      {
-        id: "datetime",
-        value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
-      },
-    ]);
+    setColumnFilters((pre) => {
+      if (pre.find((f) => f.id == "datetime")) {
+        return pre.map((f) => {
+          if (f.id == "datetime") {
+            return {
+              id: "datetime",
+              value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
+            };
+          }
+          return f;
+        });
+      }
+
+      return [
+        ...pre,
+        {
+          id: "datetime",
+          value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
+        },
+      ];
+    });
   }, [minDate, maxDate]);
 
   useEffect(() => {
-    setColumnFilters((pre) => [
-      ...pre,
-      {
-        id: "paidIn",
-        value: paidFilter,
-      },
-    ]);
+    setColumnFilters((pre) => {
+      if (pre.find((f) => f.id == "paidIn")) {
+        return pre.map((f) => {
+          if (f.id == "paidIn") {
+            return {
+              id: "paidIn",
+              value: paidFilter,
+            };
+          }
+          return f;
+        });
+      }
+
+      return [
+        ...pre,
+        {
+          id: "paidIn",
+          value: paidFilter,
+        },
+      ];
+    });
   }, [paidFilter]);
 
   function clearFilterDate() {
@@ -141,13 +169,13 @@ export function ProductDataTable<TData, TValue>({
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button variant="outline" className="ml-auto min-w-fit">
                 <FiFilter size={16} />
-                <div className="pl-2">PainIn</div>
+                <div className="pl-2">Paid-In</div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {["Cash", "Credit"].map((p, i) => {
+              {["cash", "credit"].map((p, i) => {
                 return (
                   <DropdownMenuCheckboxItem
                     key={i}
@@ -168,7 +196,7 @@ export function ProductDataTable<TData, TValue>({
                   >
                     <div
                       className={`flex items-center justify-center font-bold rounded rouned w-full px-2 ${
-                        p == "Cash"
+                        p == "cash"
                           ? "bg-green-400  text-green-900"
                           : "bg-yellow-400  text-yellow-900"
                       }`}
@@ -228,7 +256,10 @@ export function ProductDataTable<TData, TValue>({
 
         <div className="flex items-center gap-8">
           <div className="">
-            <Button variant="secondary" onClick={() => SalseToExcel(data)}>
+            <Button
+              variant="secondary"
+              onClick={() => SalseToExcel(table.getFilteredRowModel().rows)}
+            >
               Export Sales To Excel
             </Button>
           </div>
@@ -307,12 +338,7 @@ export function ProductDataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"} //not nessesary
                 >
                   {row.getVisibleCells().map((cell, i) => (
-                    <TableCell
-                      key={cell.id}
-                      // className={`${
-                      //   i == 0 || i == 1 || i == 7 ? "w-[100px]" : ""
-                      // }`}
-                    >
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

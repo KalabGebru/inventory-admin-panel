@@ -21,7 +21,7 @@ export const POST = async (request) => {
 
     console.log(newUserId);
 
-    return new Response(JSON.stringify({ result: "User Registered" }), {
+    return new Response(JSON.stringify({ result: newUserId }), {
       status: 200,
     });
   } catch (error) {

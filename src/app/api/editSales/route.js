@@ -1,8 +1,15 @@
 import services from "@/services/connect";
 
 export const POST = async (request) => {
-  const { paidIn, discounted, customer, totalAmount, items, salesId } =
-    await request.json();
+  const {
+    paidIn,
+    discounted,
+    customer,
+    totalAmount,
+    items,
+    salesId,
+    creditAmount,
+  } = await request.json();
 
   console.log(items, salesId);
 
@@ -59,17 +66,76 @@ export const POST = async (request) => {
     let addedToCustomer;
 
     if (oldSales.customer !== customer) {
-      const custmer = await services.GetCustomerById(oldSales.customer);
-      console.log(custmer);
-      const custmerHistory = custmer.history.filter((h) => h !== salesId);
+      if (customer !== "XXXX") {
+        const newcustomer = await services.GetCustomerById(customer);
+        let cuData;
+        if (paidIn == "credit") {
+          const used = newcustomer.credit.used + creditAmount;
+          cuData = {
+            history: [...newcustomer.history, created],
+            credit: { ...newcustomer.credit, used: used },
+          };
+        } else {
+          cuData = {
+            history: [...history, created],
+          };
+        }
+        addedToCustomer = services.AddSalesToCustomer(customer, salesId);
+      }
+      if (oldSales.customer !== "XXXX") {
+        const oldcustomer = await services.GetCustomerById(oldSales.customer);
+        console.log(oldcustomer);
+        const oldcustomerHistory = oldcustomer.history.filter(
+          (h) => h !== salesId
+        );
 
-      console.log(custmerHistory);
+        console.log(oldcustomerHistory);
 
-      removeFromCustomer = services.EditSalesOfCustomer(
-        oldSales.customer,
-        custmerHistory
-      );
-      addedToCustomer = services.AddSalesToCustomer(customer, salesId);
+        let cuData;
+        if (oldSales.paidIn == "credit") {
+          const used = oldcustomer.credit.used - oldSales.creditedAmount;
+          cuData = {
+            history: oldcustomerHistory,
+            credit: { ...oldcustomer.credit, used: used },
+          };
+        } else {
+          cuData = {
+            history: oldcustomerHistory,
+          };
+        }
+
+        removeFromCustomer = services.EditSalesOfCustomer(
+          oldSales.customer,
+          cuData
+        );
+      }
+    } else {
+      if (oldSales.creditedAmount != creditAmount) {
+        const thecustomer = await services.GetCustomerById(customer);
+        let cuData;
+        if (oldSales.paidIn == "credit" && paidIn == "credit") {
+          const used =
+            thecustomer.credit.used + (creditAmount - oldSales.creditedAmount);
+          cuData = {
+            credit: { ...thecustomer.credit, used: used },
+          };
+        } else if (oldSales.paidIn == "credit" && paidIn != "credit") {
+          const used = thecustomer.credit.used - oldSales.creditedAmount;
+          cuData = {
+            credit: { ...thecustomer.credit, used: used },
+          };
+        } else if (oldSales.paidIn != "credit" && paidIn == "credit") {
+          const used = thecustomer.credit.used + creditAmount;
+          cuData = {
+            credit: { ...thecustomer.credit, used: used },
+          };
+        }
+
+        removeFromCustomer = services.EditSalesOfCustomer(
+          oldSales.customer,
+          cuData
+        );
+      }
     }
 
     let err = [];
@@ -92,6 +158,7 @@ export const POST = async (request) => {
       totalAmount: totalAmount,
       paidIn: paidIn,
       items: items,
+      creditAmount: creditAmount,
     };
 
     const edited = services.EditSales(salesId, newSales);

@@ -33,6 +33,14 @@ type Customer = {
   history: string[];
 };
 
+type Inventory = {
+  productId: string;
+  datetime: string;
+  docId: string;
+  currentAmount: number;
+  history: [{ addedAmount: number; datetime: string }];
+};
+
 type Product = {
   image: string;
   id: string;
@@ -41,7 +49,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -52,7 +60,17 @@ type Items = {
 };
 
 export default function AddSalesForm() {
-  const { products, customer, setSales, setSalesLoading } = useTodo();
+  const {
+    products,
+    customer,
+    setCustomer,
+    sales,
+    setSales,
+    setSalesLoading,
+    inventory,
+    setInventory,
+    setInventoryLoading,
+  } = useTodo();
   const [sending, setSending] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<
     Customer | undefined
@@ -60,38 +78,131 @@ export default function AddSalesForm() {
   const [items, setItems] = useState<Items[]>([]);
   const [paidIn, setPaidIn] = useState("cash");
   const [discounted, setDiscounted] = useState(false);
+  const [creditAmount, setCreditAmount] = useState<number>(0);
+  const [Incash, setIncash] = useState<number>(0);
 
-  console.log(products);
+  console.log(selectedCustomer);
 
   const router = useRouter();
-  let Total: number = 0;
+  let SubTotal: number = 0;
+
+  let Total: number = SubTotal;
+
   items.forEach(
     (item) =>
-      (Total =
-        Total +
-        Math.floor(
-          Number(item.product.unit_price.replace(/[^0-9.-]+/g, "")) * item.no
-        ))
+      (SubTotal = SubTotal + Math.floor(item.product.unit_price * item.no))
   );
+  const discountAmount =
+    selectedCustomer && discounted
+      ? SubTotal * (selectedCustomer?.discount / 100)
+      : 0;
+  Total = SubTotal - discountAmount;
 
-  function fetchSalesdata() {
-    setSalesLoading(true);
-    fetch("/api/getSales")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setSales(data.Sales);
-        setSalesLoading(false);
-      })
-      .catch((err) => {
-        setSalesLoading(undefined);
-        console.log(err);
+  useEffect(() => {
+    let CIncash;
+    if (selectedCustomer && paidIn == "credit") {
+      CIncash = Total - creditAmount;
+    } else {
+      CIncash = 0;
+    }
+    setIncash(Number(CIncash.toFixed(2)));
+    console.log("h");
+  }, [selectedCustomer, items, creditAmount, paidIn]);
+
+  function fetchSalesdata(id: string, senddata: any) {
+    // setSalesLoading(true);
+    // fetch("/api/getSales")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setSales(data.Sales);
+    //     setSalesLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setSalesLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newSales = [
+      ...sales,
+      {
+        docId: id,
+        ...senddata,
+        datetime: new Date().toISOString(),
+      },
+    ];
+    setSales(newSales);
+  }
+
+  function fetchInventorydata(senddata: any) {
+    // setInventoryLoading(true);
+    // fetch("/api/getInventory")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setInventory(data.Inventory);
+    //     setInventoryLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setInventoryLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newInventory = inventory.map((Inv: Inventory) => {
+      const soldItem = senddata.items.find(
+        (item: any) => Inv.productId == item.productId
+      );
+      if (soldItem) {
+        return {
+          ...Inv,
+          currentAmount: Inv.currentAmount - soldItem.no,
+        };
+      }
+      return Inv;
+    });
+
+    setInventory(newInventory);
+  }
+
+  function fetchCustomerdata(id: string, senddata: any) {
+    if (senddata.customer !== "XXXX") {
+      const newCustomer = customer.map((Cu: Customer) => {
+        if (Cu.docId == senddata.customer) {
+          let cuData;
+          if (senddata.paidIn == "credit") {
+            const used = Cu.credit.used + senddata.creditAmount;
+            cuData = {
+              history: [...Cu.history, id],
+              credit: { ...Cu.credit, used: used },
+            };
+          } else {
+            cuData = {
+              history: [...Cu.history, id],
+            };
+          }
+          const editedCustomer = {
+            ...Cu,
+            ...cuData,
+          };
+
+          return editedCustomer;
+        }
+        return Cu;
       });
+
+      setCustomer(newCustomer);
+    }
   }
 
   async function AddSales() {
     if (items.length == 0) {
       throw Error(`you haven't selected products`);
+    }
+
+    if (paidIn == "credit" && creditAmount == 0) {
+      throw Error(`credit amount is 0 then change Paid-In in cash`);
+    }
+
+    if (paidIn == "credit" && creditAmount > Total) {
+      throw Error(` Can not Credit Above the current Total Price`);
     }
 
     if (
@@ -100,10 +211,10 @@ export default function AddSalesForm() {
       selectedCustomer.credit.max != 0
     ) {
       const left = selectedCustomer.credit.max - selectedCustomer.credit.used;
-      if (Total > left)
+      if (creditAmount > left)
         throw Error(
           `the customer only has ${left} credits. Maybe use mixed and pay the rest ${
-            Total - left
+            creditAmount - left
           } in cash`
         );
     }
@@ -116,6 +227,7 @@ export default function AddSalesForm() {
       totalAmount: Total,
       discounted: discounted,
       paidIn: paidIn,
+      creditAmount: creditAmount,
     };
     console.log(senddata);
 
@@ -128,7 +240,9 @@ export default function AddSalesForm() {
       const response = await res.json();
       console.log(response);
       if (response.result.created) {
-        fetchSalesdata();
+        fetchSalesdata(response.result.created, senddata);
+        fetchInventorydata(senddata);
+        fetchCustomerdata(response.result.created, senddata);
         router.push(`/sales/`);
         return response.result.created;
       }
@@ -211,10 +325,10 @@ export default function AddSalesForm() {
                   <div className="">
                     <span className="bg-gray-400 p-1 rounded">Credit:</span>
                     {` ${
-                      customer.credit.max == 0
+                      selectedCustomer.credit.max == 0
                         ? "No Limit"
-                        : customer.credit.max
-                    }-${customer.credit.used}`}
+                        : selectedCustomer.credit.max
+                    }-${selectedCustomer.credit.used}`}
                   </div>
                 )}
               </CardContent>
@@ -276,7 +390,7 @@ export default function AddSalesForm() {
         ) : (
           <div className="text-gray-400">No products have been selected</div>
         )}
-        {Total != 0 && <div>Total:{Total}</div>}
+        {SubTotal != 0 && <div>SubTotal:{SubTotal}</div>}
       </div>
 
       <div className="flex items-center gap-4 mb-2">
@@ -306,7 +420,7 @@ export default function AddSalesForm() {
         </div>
       ) : (
         <div className="flex items-center gap-4">
-          <span>PaidIn:</span>
+          <span>Paid-In:</span>
           <Select
             onValueChange={(value) => setPaidIn(value)}
             defaultValue={"cash"}
@@ -318,6 +432,31 @@ export default function AddSalesForm() {
               <SelectItem value="cash">Cash</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+      )}
+
+      {paidIn == "credit" && (
+        <Input
+          id="creditAmount"
+          type="number"
+          placeholder="Credit Amount"
+          required
+          max={Total}
+          value={creditAmount}
+          onChange={(e) => setCreditAmount(Number(e.target.value))}
+        />
+      )}
+
+      {Total != 0 && <div>Total:{Total}</div>}
+      {Incash > 0 && (
+        <div className="">
+          <div className="">InCredit:{creditAmount}</div>
+          <div className="">InCash:{Incash}</div>
+        </div>
+      )}
+      {paidIn == "credit" && creditAmount > Total && (
+        <div className="text-red-400">
+          Can not Credit Above the current Total Price
         </div>
       )}
 

@@ -102,8 +102,8 @@ export function Combobox({ list, setCustomer, defultValue }: Props) {
         <PopoverContent className="w-96 p-0">
           <ScrollArea className="h-96 w-96 rounded-md border">
             <Command>
-              <CommandInput placeholder="Search framework..." />
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandInput placeholder="Search Customer..." />
+              <CommandEmpty>No Customer found.</CommandEmpty>
               <CommandGroup>
                 {FW.map((framework) => (
                   <CommandItem

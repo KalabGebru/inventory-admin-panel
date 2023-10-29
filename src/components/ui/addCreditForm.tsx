@@ -52,11 +52,11 @@ export default function AddCreditForm({ customer }: Props) {
 
   function fetchCustomerdata() {
     setCustomerLoading(true);
-    fetch("/api/getCustomers")
+    fetch("/api/getCustomers", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setCustomer(data.Inventory);
+        setCustomer(data.Customers);
         setCustomerLoading(false);
       })
       .catch((err) => {

@@ -30,7 +30,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -65,7 +65,7 @@ export default function AddInventoryForm({
     resolver: zodResolver(FormSchema),
   });
 
-  function fetchProductdata() {
+  function fetchInventorydata() {
     setInventoryLoading(true);
     fetch("/api/getInventory")
       .then((response) => response.json())
@@ -94,7 +94,7 @@ export default function AddInventoryForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchProductdata();
+      fetchInventorydata();
       router.push(`/inventory/`);
       return response.result;
     }
@@ -129,7 +129,7 @@ export default function AddInventoryForm({
               alt={product.product_name}
               width={250}
               height={300}
-              className="h-full w-full bg-cover"
+              className="h-full w-full object-cover"
             />
           </div>
           <div className="flex flex-col gap-2">

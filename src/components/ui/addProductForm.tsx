@@ -66,7 +66,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -82,29 +82,53 @@ export default function AddProductForm({
   docId,
 }: Props) {
   // const [file, setfile] = useState<File>();
-  const { catagory, setProducts, setProductsLoading } = useTodo();
+  const { catagory, products, setProducts, setProductsLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const [image, setImage] = useState(
     editMode ? { image: defaultValue?.image } : { image: "" }
   );
+  console.log(image);
 
-  function fetchProductdata() {
-    setProductsLoading(true);
-    fetch("/api/getProducts")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setProducts(data.Products);
-        setProductsLoading(false);
-      })
-      .catch((err) => {
-        setProductsLoading(undefined);
-        console.log(err);
+  function fetchProductdata(id: string, newData: any) {
+    // setProductsLoading(true);
+    // fetch("/api/getProducts")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setProducts(data.Products);
+    //     setProductsLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setProductsLoading(undefined);
+    //     console.log(err);
+    //   });
+    let newProduct;
+    if (editMode) {
+      newProduct = products.map((Pro: Product) => {
+        if (Pro.docId == newData.docId) {
+          return {
+            ...Pro,
+            ...newData,
+          };
+        }
+        return Pro;
       });
+
+      setProducts(newProduct);
+    } else {
+      newProduct = [
+        ...products,
+        {
+          docId: id,
+          ...newData,
+          datetime: new Date().toISOString(),
+        },
+      ];
+      setProducts(newProduct);
+    }
   }
 
   const router = useRouter();
-  const formData = new FormData();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -112,17 +136,16 @@ export default function AddProductForm({
       id: defaultValue?.id,
       product_name: defaultValue?.product_name,
       catagory: defaultValue?.catagory,
-      unit_price: Number(
-        defaultValue?.unit_price.replace(/[^0-9.-]+/g, "")
-      ).toString(),
+      unit_price: defaultValue?.unit_price.toString(),
       details: defaultValue?.details,
     },
   });
 
   async function AddEditProduct(data: z.infer<typeof FormSchema>) {
     let res;
+    let newData;
     if (editMode && docId) {
-      const newData = {
+      newData = {
         ...data,
         image: image.image,
         docId: docId,
@@ -133,7 +156,7 @@ export default function AddProductForm({
         body: JSON.stringify(newData),
       });
     } else {
-      const newData = {
+      newData = {
         ...data,
         image: image.image,
       };
@@ -143,16 +166,13 @@ export default function AddProductForm({
       });
     }
 
-    console.log(formData);
-
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
       if (response.alreadyExist) {
-        // alert(`a product with ${data.id} already exists`);
         throw Error(`a product with ${data.id} already exists`);
       } else {
-        fetchProductdata();
+        fetchProductdata(response.result, newData);
         router.push(`/product/`);
         return response.result;
       }
@@ -179,7 +199,7 @@ export default function AddProductForm({
 
   if (!catagory) return null;
   return (
-    <div className="w-full max-w-5xl p-8 border rounded-md m-4">
+    <div className="w-full max-w-4xl p-8 border rounded-md m-4">
       <div className="text-xl mb-8">Add a Product</div>
       <Form {...form}>
         <form
@@ -187,22 +207,24 @@ export default function AddProductForm({
           className="flex flex-col gap-6"
         >
           <div className="flex flex-wrap gap-6">
-            <div className="w-full xl:w-96">
-              <FormField
-                control={form.control}
-                name="id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Product ID" {...field} />
-                    </FormControl>
-                    {/* <FormDescription>Input your user name.</FormDescription> */}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {!editMode && (
+              <div className="w-full xl:w-96">
+                <FormField
+                  control={form.control}
+                  name="id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Product ID" {...field} />
+                      </FormControl>
+                      {/* <FormDescription>Input your user name.</FormDescription> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
             <div className="w-full xl:w-96">
               <FormField
                 control={form.control}
@@ -294,12 +316,12 @@ export default function AddProductForm({
 
               <UploadImageToStorage setURL={setImage} path="product/" />
 
-              <div className="w-[200px] h-[200px] border-2 rounded-md">
+              <div className="w-[200px] h-[200px] border-2 rounded-md overflow-hidden">
                 {image.image && (
                   <Image
                     src={image.image}
                     alt={image.image}
-                    className="bg-cover h-full"
+                    className="object-cover h-full "
                     width={200}
                     height={200}
                   />

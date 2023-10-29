@@ -22,22 +22,23 @@ export default function EditCatagoryForm({ catagory }: Props) {
   const { setCatagory, setCatagoryLoading } = useTodo();
   const [catagorys, setCatagorys] = useState(catagory);
   const [sending, setSending] = useState(false);
-  console.log(catagorys);
   const router = useRouter();
 
   function fetchCatagorydata() {
-    setCatagoryLoading(true);
-    fetch("/api/getCatagorys")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setCatagory(data.result);
-        setCatagoryLoading(false);
-      })
-      .catch((err) => {
-        setCatagoryLoading(undefined);
-        console.log(err);
-      });
+    // setCatagoryLoading(true);
+    // fetch("/api/getCatagorys")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setCatagory(data.result);
+    //     setCatagoryLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setCatagoryLoading(undefined);
+    //     console.log(err);
+    //   });
+
+    setCatagory(catagorys);
   }
 
   async function EditCatagory() {

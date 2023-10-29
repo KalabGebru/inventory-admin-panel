@@ -54,7 +54,7 @@ type Props = {
 };
 
 export function EditUsers({ user }: Props) {
-  const { setUsers, setUsersLoading } = useTodo();
+  const { users, setUsers, setUsersLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const [changePassword, setChangePassword] = useState(false);
   const [hideNewPassword, setHideNewPassword] = useState(true);
@@ -73,19 +73,38 @@ export function EditUsers({ user }: Props) {
     },
   });
 
-  function fetchUsersdata() {
-    setUsersLoading(true);
-    fetch("/api/getUsers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setUsers(data.Users);
-        setUsersLoading(false);
-      })
-      .catch((err) => {
-        setUsersLoading(undefined);
-        console.log(err);
-      });
+  function fetchUsersdata(id: string, newdata: any) {
+    // setUsersLoading(true);
+    // fetch("/api/getUsers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setUsers(data.Users);
+    //     setUsersLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setUsersLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newUsers = users.map((Pro: User) => {
+      if (Pro.docId == id) {
+        const updatedUser = {
+          docId: id,
+          username: newdata.username,
+          email: newdata.email,
+          password: "",
+          role: newdata.role,
+          image: newdata.image ? newdata.image : "",
+        };
+        return {
+          ...Pro,
+          ...updatedUser,
+        };
+      }
+      return Pro;
+    });
+
+    setUsers(newUsers);
   }
 
   async function EditUser(data: z.infer<typeof FormSchema>) {
@@ -138,7 +157,7 @@ export function EditUsers({ user }: Props) {
         throw Error("Current Password Doesn't match");
       }
       if (response.updated) {
-        fetchUsersdata();
+        fetchUsersdata(user.docId, newdata);
         router.push(`/users/`);
         return response.updated;
       }
@@ -219,6 +238,7 @@ export function EditUsers({ user }: Props) {
                     <SelectContent>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="sales">Sales</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

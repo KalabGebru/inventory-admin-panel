@@ -8,6 +8,8 @@ import { useState } from "react";
 import { ComboboxInventory } from "./ComboboxInventory";
 import Image from "next/image";
 import Link from "next/link";
+import { useTodo } from "@/hooks/useContextData";
+import { toast } from "sonner";
 
 type Product = {
   image: string;
@@ -17,7 +19,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -26,13 +28,30 @@ type Props = {
 };
 
 export default function CreateInventoryForm({ product }: Props) {
+  const { setInventory, setInventoryLoading } = useTodo();
   const [items, setItems] = useState<Product>();
+  const [sending, setSending] = useState(false);
+  console.log(product);
 
   const router = useRouter();
 
-  async function onSubmit(productId: string) {
-    console.log();
+  function fetchInventorydata(response: any) {
+    setInventoryLoading(true);
+    fetch("/api/getInventory")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setInventory(data.Inventory);
+        setInventoryLoading(false);
+        router.push(`/inventory/addInventory/${response.result}`);
+      })
+      .catch((err) => {
+        setInventoryLoading(undefined);
+        console.log(err);
+      });
+  }
 
+  async function creatingInventory(productId: string) {
     const res = await fetch("/api/createInventory", {
       method: "POST",
       body: JSON.stringify({ productId }),
@@ -42,9 +61,27 @@ export default function CreateInventoryForm({ product }: Props) {
       const response = await res.json();
       console.log(response);
       if (response.result) {
-        router.push(`/inventory/addInventory/${response.result}`);
+        fetchInventorydata(response);
+        return response.result;
       }
+      throw Error("error");
     }
+  }
+  async function onSubmit(productId: string) {
+    console.log();
+
+    setSending(true);
+    toast.promise(creatingInventory(productId), {
+      loading: "Creating Inventory ...",
+      success: (res) => {
+        setSending(false);
+        return `Inventory has been Created `;
+      },
+      error: (err) => {
+        setSending(false);
+        return err.message;
+      },
+    });
   }
 
   return (
@@ -64,7 +101,7 @@ export default function CreateInventoryForm({ product }: Props) {
                     alt={items.product_name}
                     width={100}
                     height={200}
-                    className="w-full h-full bg-cover"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="w-full">
@@ -96,7 +133,10 @@ export default function CreateInventoryForm({ product }: Props) {
                 </div>
               ) : (
                 <div className="flex items-center justify-end w-full">
-                  <Button onClick={() => onSubmit(items.docId)}>
+                  <Button
+                    disabled={sending}
+                    onClick={() => onSubmit(items.docId)}
+                  >
                     create Inventory
                   </Button>
                 </div>

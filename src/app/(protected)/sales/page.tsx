@@ -31,6 +31,7 @@ type Sales = {
   docId: string;
   discounted: string;
   totalAmount: number;
+  creditedAmount: number;
   paidIn: string;
   items: Items[];
 };
@@ -55,7 +56,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -68,6 +69,7 @@ type SalesViewData = {
   docId: string;
   discounted: string;
   totalAmount: number;
+  creditedAmount: number;
   paidIn: string;
   items: Items[];
 };
@@ -79,14 +81,16 @@ export default function Sales() {
   //   services.AddProduct(C);
   // });
 
-  function fetchSalesdata() {
-    fetch("/api/getSales")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setSales(data.Sales);
-      })
-      .catch((err) => console.log(err));
+  function fetchSalesdata(id: string) {
+    // fetch("/api/getSales")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setSales(data.Sales);
+    //   })
+    //   .catch((err) => console.log(err));
+    const newSales = sales.filter((sale: Sales) => sale.docId != id);
+    setSales(newSales);
   }
 
   if (!products) {
@@ -127,7 +131,7 @@ export default function Sales() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.success);
-      if (response.success) fetchSalesdata();
+      if (response.success) fetchSalesdata(id);
       return response.success;
     }
     throw Error("error");
@@ -215,7 +219,7 @@ export default function Sales() {
       },
     },
     {
-      header: "PaidIn",
+      header: "Paid-In",
       accessorKey: "paidIn",
       cell: ({ row }) => {
         const paidIn = row.getValue("paidIn");

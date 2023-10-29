@@ -18,7 +18,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -38,7 +38,7 @@ export default function AddInventoryID({ params }: Props) {
   if (!inventoryData) return <div className="">no Inventory by that ID</div>;
 
   const productData = products.find(
-    (p: Product) => p.docId == inventoryData.docId
+    (p: Product) => p.docId == inventoryData.productId
   );
 
   if (!productData) return <div className="">no product by that ID</div>;

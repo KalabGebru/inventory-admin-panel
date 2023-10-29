@@ -35,6 +35,7 @@ import { FiFilter } from "react-icons/fi";
 import { BsFilterRight } from "react-icons/bs";
 import LoadingSpinner from "@/components/ui/loadingSpinner";
 import { useTodo } from "@/hooks/useContextData";
+import { InventoryToExcel } from "@/lib/xlsx";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -99,23 +100,50 @@ export function InventoryDataTable<TData, TValue>({
   }
 
   useEffect(() => {
-    setColumnFilters((pre) => [
-      ...pre,
-      {
-        id: "datetime",
-        value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
-      },
-    ]);
+    setColumnFilters((pre) => {
+      if (pre.find((f) => f.id == "datetime")) {
+        return pre.map((f) => {
+          if (f.id == "datetime") {
+            return {
+              id: "datetime",
+              value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
+            };
+          }
+          return f;
+        });
+      }
+      return [
+        ...pre,
+        {
+          id: "datetime",
+          value: `${minDate ? minDate : ""},${maxDate ? maxDate : ""}`,
+        },
+      ];
+    });
   }, [minDate, maxDate]);
 
   useEffect(() => {
-    setColumnFilters((pre) => [
-      ...pre,
-      {
-        id: "catagory",
-        value: catagoryFilter,
-      },
-    ]);
+    setColumnFilters((pre) => {
+      if (pre.find((f) => f.id == "catagory")) {
+        return pre.map((f) => {
+          if (f.id == "catagory") {
+            return {
+              id: "catagory",
+              value: catagoryFilter,
+            };
+          }
+          return f;
+        });
+      }
+
+      return [
+        ...pre,
+        {
+          id: "catagory",
+          value: catagoryFilter,
+        },
+      ];
+    });
   }, [catagoryFilter]);
 
   function clearFilterDate() {
@@ -238,6 +266,14 @@ export function InventoryDataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-8">
+          <div className="">
+            <Button
+              variant="secondary"
+              onClick={() => InventoryToExcel(table.getFilteredRowModel().rows)}
+            >
+              Export Inventory To Excel
+            </Button>
+          </div>
           <div className="">
             <Button asChild>
               <Link href="/inventory/addInventory">Add Inventory</Link>

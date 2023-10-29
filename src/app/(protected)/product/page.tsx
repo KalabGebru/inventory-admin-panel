@@ -23,7 +23,6 @@ import {
 import { FiMoreVertical } from "react-icons/fi";
 import Link from "next/link";
 import { toast } from "sonner";
-import { error } from "console";
 type Cat = {
   datetime: string;
   catagoryName: string;
@@ -38,7 +37,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -54,14 +53,17 @@ export default function Products() {
     };
   });
 
-  function fetchProductdata() {
-    fetch("/api/getProducts")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setProducts(data.Products);
-      })
-      .catch((err) => console.log(err));
+  function fetchProductdata(id: string) {
+    // fetch("/api/getProducts")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setProducts(data.Products);
+    //   })
+    //   .catch((err) => console.log(err));
+
+    const newProduct = products.filter((Pro: Product) => Pro.docId != id);
+    setProducts(newProduct);
   }
 
   async function deleteProduct(id: string) {
@@ -74,7 +76,7 @@ export default function Products() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.success);
-      if (response.success) fetchProductdata();
+      if (response.success) fetchProductdata(id);
       return response.success;
     }
     throw Error;
@@ -155,6 +157,11 @@ export default function Products() {
     {
       header: "Unit Price",
       accessorKey: "unit_price",
+      cell: ({ row }) => {
+        const unit_price: number = row.getValue("unit_price");
+
+        return <div className="">{unit_price.toLocaleString("en-US")} ETB</div>;
+      },
     },
     {
       header: ({ column }) => {
@@ -238,7 +245,7 @@ export default function Products() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(rowdata.unit_price)
+                  navigator.clipboard.writeText(rowdata.unit_price.toString())
                 }
               >
                 Copy Product Price

@@ -1,7 +1,6 @@
+"use client";
 import EditInventoryForm from "@/components/ui/editInventoryForm";
 import { useTodo } from "@/hooks/useContextData";
-import services from "@/services/connect";
-
 type Inventory = {
   productId: string;
   datetime: string;
@@ -18,7 +17,7 @@ type Product = {
   datetime: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -38,20 +37,18 @@ export default function EditInventory({ params }: Props) {
   if (!inventoryData) return <div className="">no Inventory by that ID</div>;
 
   const productData = products.find(
-    (p: Product) => p.docId == inventoryData.docId
+    (p: Product) => p.docId == inventoryData.productId
   );
 
   if (!productData) return <div className="">no product by that ID</div>;
 
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <div className="w-full max-w-3xl border-2 rounded-lg">
-        <EditInventoryForm
-          product={productData}
-          inventoryId={params.inventoryId}
-          inventory={inventoryData}
-        />
-      </div>
+      <EditInventoryForm
+        product={productData}
+        inventoryId={params.inventoryId}
+        inventory={inventoryData}
+      />
     </div>
   );
 }

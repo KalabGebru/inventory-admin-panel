@@ -6,6 +6,7 @@ type Sales = {
   customer: string;
   items: Items[];
   totalAmount: number;
+  creditedAmount: number;
   docId: string;
   paidIn: string;
   datetime: string;

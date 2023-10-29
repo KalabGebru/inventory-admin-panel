@@ -43,7 +43,7 @@ const services = {
         },
         { merge: true }
       );
-      return custemerid;
+      return custemerid.id;
     } catch (err) {
       console.log(err);
       return "something went wrong";
@@ -114,24 +114,6 @@ const services = {
         },
         { merge: true }
       );
-      // if (Sales.paidIn == "credit") {
-      //   const createdref = doc(db, "Customer", Sales.customer);
-
-      //   const product = await getDoc(customersref);
-
-      //   const custmerdata = product.data();
-
-      //   await setDoc(
-      //     createdref,
-      //     {
-      //       credit: {
-      //         ...custmerdata.credit,
-      //         used: custmerdata.credit.used + Number(Sales.totalAmount),
-      //       },
-      //     },
-      //     { merge: true }
-      //   );
-      // }
       return data.id;
     } catch (err) {
       console.log(err);
@@ -325,7 +307,7 @@ const services = {
       console.log(allusers);
       return allusers;
     } catch (err) {
-      return undefined;
+      throw Error;
     }
   },
   GetAllCatagorys: async () => {
@@ -338,7 +320,7 @@ const services = {
       return allcatagorys;
     } catch (err) {
       console.log(err);
-      return undefined;
+      throw Error;
     }
   },
   GetAllCustomers: async () => {
@@ -348,7 +330,7 @@ const services = {
       const allcustomers = data.docs.map((doc) => doc.data());
       return allcustomers;
     } catch (err) {
-      return undefined;
+      throw Error;
     }
   },
   GetAllProducts: async () => {
@@ -358,7 +340,7 @@ const services = {
       const allproducts = data.docs.map((doc) => doc.data());
       return allproducts;
     } catch (err) {
-      return undefined;
+      throw Error;
     }
   },
   GetAllInventorys: async () => {
@@ -368,7 +350,7 @@ const services = {
       const allinventorys = data.docs.map((doc) => doc.data());
       return allinventorys;
     } catch (err) {
-      return undefined;
+      throw Error;
     }
   },
   GetAllSeles: async () => {
@@ -378,7 +360,7 @@ const services = {
       const allsales = data.docs.map((doc) => doc.data());
       return allsales;
     } catch (err) {
-      return undefined;
+      throw Error;
     }
   },
   DeleteCustomer: async (Id) => {
@@ -584,14 +566,14 @@ const services = {
       return "something went wrong";
     }
   },
-  EditSalesOfCustomer: async (customerId, history) => {
+  EditSalesOfCustomer: async (customerId, cuData) => {
     const customersref = doc(db, "Customers", customerId);
 
     try {
       await setDoc(
         customersref,
         {
-          history: history,
+          ...cuData,
         },
         { merge: true }
       );
@@ -602,37 +584,19 @@ const services = {
     }
   },
 
-  Ed: async (Data) => {
-    try {
-      const topProducts = await fetch("http://localhost:3000/api/topProducts", {
-        method: "POST",
-        body: JSON.stringify(Data),
-      });
-      console.log(topProducts);
-      if (topProducts.ok) {
-        const Response = await topProducts.json();
-        console.log(Response);
-      }
-      return true;
-    } catch (err) {
-      console.log(err);
-      return "something went wrong";
-    }
-  },
-
-  // EditAllInventory: async () => {
-  //   const productssref = collection(db, "Customers");
+  // EditAllSales2: async () => {
+  //   const productssref = collection(db, "Products");
   //   try {
   //     const data = await getDocs(productssref);
   //     const allproducts = data.docs.map((doc) => doc.data());
 
   //     for (let i = 0; i < allproducts.length; i++) {
-  //       const created = doc(db, "Customers", allproducts[i].docId);
+  //       const created = doc(db, "Products", allproducts[i].docId);
 
   //       await setDoc(
   //         created,
   //         {
-  //           credit: { allowed: Math.random() < 0.25, max: 0, used: 0 },
+  //           unit_price: Number(allproducts[i].unit_price),
   //         },
   //         { merge: true }
   //       );
@@ -646,5 +610,3 @@ const services = {
 };
 
 export default services;
-
-const cat = ["beer", "wine", "wiski", "tekila", "gine"];

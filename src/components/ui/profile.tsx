@@ -142,7 +142,7 @@ export default function Profile({ user }: Props) {
             <Image
               src={currentUserData.image}
               alt={currentUserData.image}
-              className="bg-cover h-full"
+              className="object-cover h-full"
               width={200}
               height={200}
             />

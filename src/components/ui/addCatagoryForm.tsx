@@ -41,19 +41,28 @@ export default function AddCatagoryForm() {
     resolver: zodResolver(FormSchema),
   });
 
-  function fetchCatagorydata() {
-    setCatagoryLoading(true);
-    fetch("/api/getCatagorys")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setCatagory(data.result);
-        setCatagoryLoading(false);
-      })
-      .catch((err) => {
-        setCatagoryLoading(undefined);
-        console.log(err);
-      });
+  function fetchCatagorydata(id: any, postdata: any) {
+    // setCatagoryLoading(true);
+    // fetch("/api/getCatagorys")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setCatagory(data.result);
+    //     setCatagoryLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setCatagoryLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newProduct = [
+      ...catagory,
+      {
+        docId: id,
+        ...postdata,
+        datetime: new Date().toISOString(),
+      },
+    ];
+    setCatagory(newProduct);
   }
 
   async function AddCatagory(data: z.infer<typeof FormSchema>) {
@@ -69,7 +78,7 @@ export default function AddCatagoryForm() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchCatagorydata();
+      fetchCatagorydata(response.result, postdata);
       router.push(`/product/`);
       return response.result;
     }

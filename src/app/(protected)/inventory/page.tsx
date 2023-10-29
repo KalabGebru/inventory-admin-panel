@@ -30,7 +30,7 @@ type Product = {
   catagory: string;
   docId: string;
   details: string;
-  unit_price: string;
+  unit_price: number;
   product_name: string;
 };
 
@@ -68,14 +68,16 @@ export default function Inventory() {
   // products.forEach((C) => {
   //   services.AddProduct(C);
   // });
-  function fetchInventorydata() {
-    fetch("/api/getInventory")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventory(data.Inventory);
-      })
-      .catch((err) => console.log(err));
+  function fetchInventorydata(id: string) {
+    // fetch("/api/getInventory")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setInventory(data.Inventory);
+    //   })
+    //   .catch((err) => console.log(err));
+    const newInventory = inventory.filter((Inv: Inventory) => Inv.docId != id);
+    setInventory(newInventory);
   }
 
   if (!products) {
@@ -108,7 +110,7 @@ export default function Inventory() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.success);
-      if (response.success) fetchInventorydata();
+      if (response.success) fetchInventorydata(id);
       return response.success;
     }
     throw Error;

@@ -40,14 +40,16 @@ export default function Customer() {
   const { customer, setCustomer, setCustomerLoading } = useTodo();
   console.log(customer);
 
-  function fetchCustomerdata() {
-    fetch("/api/getCustomers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setCustomer(data.Customers);
-      })
-      .catch((err) => console.log(err));
+  function fetchCustomerdata(id: string) {
+    // fetch("/api/getCustomers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setCustomer(data.Customers);
+    //   })
+    //   .catch((err) => console.log(err));
+    const newCustomer = customer.filter((Cu: Customer) => Cu.docId != id);
+    setCustomer(newCustomer);
   }
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function Customer() {
     if (res.ok) {
       const response = await res.json();
       console.log(response.success);
-      if (response.success) fetchCustomerdata();
+      if (response.success) fetchCustomerdata(id);
       return response.success;
     }
     throw Error;
@@ -183,7 +185,7 @@ export default function Customer() {
     },
     {
       header: "Credit used",
-      accessorKey: "credit",
+      // accessorKey: "credit",      //credit used twice
       cell: ({ row }) => {
         const credit: credit = row.getValue("credit");
         return (
@@ -266,7 +268,6 @@ export default function Customer() {
       },
     },
   ];
-  // await services.EditAllProducts();
 
   return (
     <main className="flex flex-col h-full w-full p-12 gap-8">
