@@ -28,6 +28,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTodo } from "@/hooks/useContextData";
 import { toast } from "sonner";
+import { FiEdit } from "react-icons/fi";
+import Image from "next/image";
+import UploadImageToStorage from "./UploadImg";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -56,6 +59,8 @@ type Props = {
 export function EditUsers({ user }: Props) {
   const { users, setUsers, setUsersLoading } = useTodo();
   const [sending, setSending] = useState(false);
+  const [editImage, setEditImage] = useState(false);
+  const [currentUserData, setCurrentUserData] = useState(user);
   const [changePassword, setChangePassword] = useState(false);
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [hideCurrentPassword, setHideCurrentPassword] = useState(true);
@@ -119,7 +124,7 @@ export function EditUsers({ user }: Props) {
     }
     const newdata = {
       ...data,
-      image: user.image,
+      image: currentUserData.image,
       docId: user.docId,
       changePassword: false,
       currentPassword: "",
@@ -184,6 +189,23 @@ export function EditUsers({ user }: Props) {
   return (
     <div className="w-full max-w-xl m-4 flex flex-col gap-4 p-8 border rounded-md">
       <div className="text-xl mb-8">Edit Users</div>
+      <div className=" relative w-[200px] h-[200px] max-h-full max-w-full bg-green-400">
+        <div className=" absolute top-0 right-0 z-30">
+          <FiEdit
+            onClick={() => setEditImage((pre) => !pre)}
+            size={30}
+            color="green"
+            className=" cursor-pointer p-1 hover:bg-gray-400"
+          />
+        </div>
+        <Image
+          src={currentUserData.image}
+          alt={currentUserData.username}
+          className="object-cover h-full"
+          width={200}
+          height={200}
+        />
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -313,6 +335,9 @@ export function EditUsers({ user }: Props) {
             >
               change password
             </Button>
+          )}
+          {editImage && (
+            <UploadImageToStorage setURL={setCurrentUserData} path="image/" />
           )}
           <div className="flex justify-end items-center w-full mt-4">
             <Button disabled={sending} type="submit">

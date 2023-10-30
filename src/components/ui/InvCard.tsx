@@ -28,6 +28,9 @@ export default function InvCard({ no, Labal }: Props) {
       .then((data: any) => {
         console.log(data);
         setData(data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }, [no]);
 

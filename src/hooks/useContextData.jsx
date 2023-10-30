@@ -114,6 +114,7 @@ export function DataProvider({ children }) {
         setUsers,
         usersLoading,
         setUsersLoading,
+        fetchAllPagedata,
       }}
     >
       {children}

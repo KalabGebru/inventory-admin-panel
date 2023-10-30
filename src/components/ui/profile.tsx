@@ -21,7 +21,7 @@ type Props = {
   user: User;
 };
 export default function Profile({ user }: Props) {
-  const { setUsers, setUsersLoading } = useTodo();
+  const { users, setUsers, setUsersLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const [currentUserData, setCurrentUserData] = useState(user);
   const [editMail, setEditMail] = useState(false);
@@ -38,20 +38,39 @@ export default function Profile({ user }: Props) {
 
   const router = useRouter();
 
-  function fetchUsersdata() {
-    setUsersLoading(true);
-    fetch("/api/getUsers")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setUsers(data.Users);
-        setUsersLoading(false);
-        router.push(`/profile/${currentUserData.username}`);
-      })
-      .catch((err) => {
-        setUsersLoading(undefined);
-        console.log(err);
-      });
+  function fetchUsersdata(newdata: any) {
+    // setUsersLoading(true);
+    // fetch("/api/getUsers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setUsers(data.Users);
+    //     setUsersLoading(false);
+    //     router.push(`/profile/${currentUserData.username}`);
+    //   })
+    //   .catch((err) => {
+    //     setUsersLoading(undefined);
+    //     console.log(err);
+    //   });
+    // {
+    //   role: 'admin',
+    //   username: 'jane doe',
+    //   image:
+    //     'https://firebasestorage.googleapis.com/v0/b/inventory-app-b78f3.appspot.com/o/image%2Floading_image.png?alt=media&token=79b09057-34ff-4533-b2bf-f7b101e1ecd8',
+    //   email: 'janedoe@ggg.com',
+    //   docId: 'ocHVgp9dYmOZm0803qO9'
+    // }
+    const newUsers = users.map((Pro: User) => {
+      if (Pro.docId == newdata.docId) {
+        return {
+          ...Pro,
+          ...newdata,
+        };
+      }
+      return Pro;
+    });
+
+    setUsers(newUsers);
   }
 
   async function EditProfile() {
@@ -76,7 +95,6 @@ export default function Profile({ user }: Props) {
         (newdata.currentPassword = currentPassword);
       newdata.newPassword = newPassword;
     }
-    console.log(newdata);
 
     const Userexist = await fetch("/api/userExists", {
       method: "POST",
@@ -92,6 +110,7 @@ export default function Profile({ user }: Props) {
         throw Error(`Username '${currentUserData.username}' exists`);
       }
     }
+    console.log(newdata);
     const res = await fetch("/api/editUser", {
       method: "POST",
       body: JSON.stringify(newdata),
@@ -104,7 +123,7 @@ export default function Profile({ user }: Props) {
         alert("Current Password Doesn't match");
       }
       if (response.updated) {
-        fetchUsersdata();
+        fetchUsersdata(newdata);
         return response.updated;
       }
     }
@@ -289,7 +308,7 @@ export default function Profile({ user }: Props) {
         )}
 
         <div className="flex justify-end">
-          <Button variant="secondary" onClick={onSave}>
+          <Button disabled={sending} variant="secondary" onClick={onSave}>
             Save Changes
           </Button>
         </div>

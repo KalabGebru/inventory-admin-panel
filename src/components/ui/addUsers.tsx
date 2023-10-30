@@ -28,6 +28,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTodo } from "@/hooks/useContextData";
 import { toast } from "sonner";
+import { FiEdit } from "react-icons/fi";
+import Image from "next/image";
+import UploadImageToStorage from "./UploadImg";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -47,6 +50,8 @@ const FormSchema = z.object({
 export function AddUsers() {
   const { users, setUsers, setUsersLoading } = useTodo();
   const [sending, setSending] = useState(false);
+  const [editImage, setEditImage] = useState(false);
+  const [currentUserData, setCurrentUserData] = useState({ image: "" });
   const [hidePassword, setHidePassword] = useState(true);
   const router = useRouter();
   console.log(users);
@@ -74,7 +79,7 @@ export function AddUsers() {
         docId: id,
         ...newData,
         password: "",
-        image: "",
+        image: currentUserData.image,
         datetime: new Date().toISOString(),
       },
     ];
@@ -127,6 +132,23 @@ export function AddUsers() {
   return (
     <div className="w-full max-w-xl m-4 flex flex-col gap-4 p-8 border rounded-md">
       <div className="text-xl mb-8">Add Users</div>
+      <div className=" relative w-[200px] h-[200px] max-h-full max-w-full bg-green-400">
+        <div className=" absolute top-0 right-0 z-30">
+          <FiEdit
+            onClick={() => setEditImage((pre) => !pre)}
+            size={30}
+            color="green"
+            className=" cursor-pointer p-1 hover:bg-gray-400"
+          />
+        </div>
+        <Image
+          src={currentUserData.image}
+          alt={currentUserData.image}
+          className="object-cover h-full"
+          width={200}
+          height={200}
+        />
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -224,6 +246,9 @@ export function AddUsers() {
               </FormItem>
             )}
           />
+          {editImage && (
+            <UploadImageToStorage setURL={setCurrentUserData} path="image/" />
+          )}
           <div className="flex justify-end items-center w-full mt-2">
             <Button disabled={sending} type="submit">
               Submit

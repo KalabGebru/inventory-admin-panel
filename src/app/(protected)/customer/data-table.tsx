@@ -33,6 +33,7 @@ import Link from "next/link";
 import { FiFilter } from "react-icons/fi";
 import { useTodo } from "@/hooks/useContextData";
 import LoadingSpinner from "@/components/ui/loadingSpinner";
+import ReFetchAllDataButton from "@/components/ui/reFetchAllDataButton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,7 +87,7 @@ export function CustomerDataTable<TData, TValue>({
 
   if (customerLoading == undefined)
     return (
-      <div className="w-full flex justify-center p-24">
+      <div className="w-full flex flex-col items-center justify-center  gap-2 p-24">
         <span>Error occured while fetching Data</span>
       </div>
     );
