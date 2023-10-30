@@ -23,32 +23,73 @@ type Product = {
   product_name: string;
 };
 
+type Inventory = {
+  productId: string;
+  datetime: string;
+  docId: string;
+  currentAmount: number;
+  history: [{ addedAmount: number; datetime: string }];
+};
+
 type Props = {
   product: Product[];
 };
 
 export default function CreateInventoryForm({ product }: Props) {
-  const { setInventory, setInventoryLoading } = useTodo();
+  const {
+    customer,
+    setCustomer,
+    inventory,
+    setInventory,
+    setInventoryLoading,
+  } = useTodo();
   const [items, setItems] = useState<Product>();
   const [sending, setSending] = useState(false);
   console.log(product);
 
   const router = useRouter();
 
-  function fetchInventorydata(response: any) {
-    setInventoryLoading(true);
-    fetch("/api/getInventory")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventory(data.Inventory);
-        setInventoryLoading(false);
-        router.push(`/inventory/addInventory/${response.result}`);
-      })
-      .catch((err) => {
-        setInventoryLoading(undefined);
-        console.log(err);
-      });
+  function fetchInventorydata(invId: string, productId: string) {
+    // setInventoryLoading(true);
+    // fetch("/api/getInventory")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setInventory(data.Inventory);
+    //     setInventoryLoading(false);
+    //     router.push(`/inventory/addInventory/${invId}`);
+    //   })
+    //   .catch((err) => {
+    //     setInventoryLoading(undefined);
+    //     console.log(err);
+    //   });
+
+    const createdInv = {
+      docId: invId,
+      productId: productId,
+      history: [],
+      currentAmount: 0,
+      datetime: new Date().toISOString(),
+    };
+    const newInventory = [
+      ...inventory,
+      {
+        ...createdInv,
+      },
+    ];
+    setInventory(newInventory);
+
+    const newCustomer = customer.map((Cu: any) => {
+      if (Cu.docId == productId) {
+        return {
+          ...Cu,
+          invId: invId,
+        };
+      }
+      return Cu;
+    });
+    setCustomer(newCustomer);
+    router.push(`/inventory/addInventory/${invId}`);
   }
 
   async function creatingInventory(productId: string) {
@@ -61,7 +102,7 @@ export default function CreateInventoryForm({ product }: Props) {
       const response = await res.json();
       console.log(response);
       if (response.result) {
-        fetchInventorydata(response);
+        fetchInventorydata(response.result, productId);
         return response.result;
       }
       throw Error("error");

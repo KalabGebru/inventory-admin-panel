@@ -26,8 +26,14 @@ export const options: NextAuthOptions = {
 
         const allUser = await services.GetAllUsers();
         if (!allUser) return null;
+        const filterdUsers = allUser.filter(
+          (Users) => Users.role == "admin" || Users.role == "manager"
+        );
         console.log(credentials);
-        const user = allUser?.find(
+
+        console.log(filterdUsers);
+
+        const user = filterdUsers?.find(
           (user) => user.username == credentials?.username
         );
         if (!user) return null;

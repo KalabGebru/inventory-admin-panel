@@ -33,32 +33,59 @@ type Inventory = {
 type Props = {
   product: Product;
   inventoryId: string;
-  inventory?: Inventory;
+  inventoryData: Inventory;
 };
 
 export default function EditInventoryForm({
   product,
   inventoryId,
-  inventory,
+  inventoryData,
 }: Props) {
-  const { setInventory, setInventoryLoading } = useTodo();
-  const [history, setHistory] = useState(inventory?.history);
+  const { inventory, setInventory, setInventoryLoading } = useTodo();
+  const [history, setHistory] = useState(inventoryData?.history);
   const [sending, setSending] = useState(false);
   const router = useRouter();
 
-  function fetchProductdata() {
-    setInventoryLoading(true);
-    fetch("/api/getInventory")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventory(data.Inventory);
-        setInventoryLoading(false);
-      })
-      .catch((err) => {
-        setInventoryLoading(undefined);
-        console.log(err);
-      });
+  console.log(history);
+
+  function fetchInventorydata(postdata: any) {
+    // setInventoryLoading(true);
+    // fetch("/api/getInventory")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setInventory(data.Inventory);
+    //     setInventoryLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setInventoryLoading(undefined);
+    //     console.log(err);
+    //   });
+    let sum = 0;
+    inventoryData.history.forEach((element) => {
+      sum += element.addedAmount;
+    });
+
+    let sold = sum - inventoryData.currentAmount;
+
+    let currentSum = 0;
+    postdata.history.forEach((element: any) => {
+      currentSum += element.addedAmount;
+    });
+
+    let currentAmountinv = currentSum - sold;
+
+    const newInventory = inventory.map((Inv: Inventory) => {
+      if (Inv.docId == postdata.inventoryId) {
+        return {
+          ...Inv,
+          history: postdata.history,
+          currentAmount: currentAmountinv,
+        };
+      }
+      return Inv;
+    });
+    setInventory(newInventory);
   }
 
   async function EditInventory() {
@@ -75,7 +102,7 @@ export default function EditInventoryForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchProductdata();
+      fetchInventorydata(postdata);
       router.push(`/inventory/`);
       return response.result;
     }
@@ -127,7 +154,9 @@ export default function EditInventoryForm({
             </div>
             <div className="flex gap-2">
               <span className="bg-gray-400 rounded px-1">price : </span>
-              <div className="">{product.unit_price}</div>
+              <div className="">
+                {product.unit_price.toLocaleString("en-US")} ETB
+              </div>
             </div>
           </div>
         </CardContent>

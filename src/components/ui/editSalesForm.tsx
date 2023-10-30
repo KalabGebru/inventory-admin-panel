@@ -90,9 +90,14 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
   } = useTodo();
   console.log(sale);
   const [sending, setSending] = useState(false);
-  let selectedCustomer = customers.find(
-    (c) => c.docId === sale.customer
-  ) as Customer;
+  let selectedCustomer: any;
+  if (sale.customer != "XXXX") {
+    selectedCustomer = customers.find(
+      (c) => c.docId === sale.customer
+    ) as Customer;
+  } else {
+    selectedCustomer = undefined;
+  }
   const oldItem = sale.items.map((item) => {
     return {
       ...item,
@@ -123,21 +128,19 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
       (SubTotal = SubTotal + Math.floor(item.product.unit_price * item.no))
   );
   const discountAmount =
-    selectedCustomer && discounted
-      ? SubTotal * (selectedCustomer?.discount / 100)
-      : 0;
+    customer && discounted ? SubTotal * (customer?.discount / 100) : 0;
   Total = SubTotal - discountAmount;
 
   useEffect(() => {
     let CIncash;
-    if (selectedCustomer && paidIn == "credit") {
+    if (customer && paidIn == "credit") {
       CIncash = Total - creditAmount;
     } else {
       CIncash = 0;
     }
     setIncash(Number(CIncash.toFixed(2)));
     console.log("h");
-  }, [selectedCustomer, items, creditAmount, paidIn]);
+  }, [customer, items, creditAmount, discounted, paidIn]);
 
   console.log(Total);
 
@@ -154,8 +157,9 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
     //     setSalesLoading(undefined);
     //     console.log(err);
     //   });
+    console.log(senddata);
     const newSales = sales.map((S: Product) => {
-      if (S.docId == senddata.docId) {
+      if (S.docId == senddata.salesId) {
         const newSale = {
           customer: senddata.customer,
           discounted: senddata.discounted,
@@ -188,10 +192,10 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
     //     setInventoryLoading(undefined);
     //     console.log(err);
     //   });
-    const Items = senddata.items;
+    let Items = senddata.items;
     sale.items.forEach((oldi) => {
       if (Items.find((item: any) => item.productId == oldi.productId)) {
-        Items.map((item: any) => {
+        const newItem = Items.map((item: any) => {
           if (item.productId == oldi.productId) {
             return {
               ...item,
@@ -200,8 +204,9 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
           }
           return item;
         });
+        Items = newItem;
       } else {
-        Items.push({ ...oldi, no: -oldi.no });
+        Items = [...Items, { ...oldi, no: -oldi.no }];
       }
     });
 
@@ -308,19 +313,12 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
       throw Error(` Can not Credit Above the current Total Price`);
     }
 
-    if (
-      selectedCustomer &&
-      paidIn === "credit" &&
-      selectedCustomer.credit.max != 0
-    ) {
+    if (customer && paidIn === "credit" && customer.credit.max != 0) {
       let left;
       if (sale.paidIn == "credit") {
-        left =
-          selectedCustomer.credit.max -
-          selectedCustomer.credit.used +
-          sale.creditedAmount;
+        left = customer.credit.max - customer.credit.used + sale.creditedAmount;
       } else {
-        left = selectedCustomer.credit.max - selectedCustomer.credit.used;
+        left = customer.credit.max - customer.credit.used;
       }
 
       if (Total > left)
@@ -379,14 +377,15 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
   }
 
   function subtruct(id: string) {
-    setItems((pre) => {
-      return pre.map((item) => {
-        if (item.productId == id && item.no > 1) {
-          return { ...item, no: item.no - 1 };
-        }
-        return item;
-      });
+    const newItems = items.map((item) => {
+      if (item.productId == id) {
+        return { ...item, no: item.no - 1 };
+      }
+      return item;
     });
+    const deletezero = newItems.filter((item) => item.no != 0);
+
+    setItems(deletezero);
   }
 
   function add(id: string) {
@@ -444,7 +443,11 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
                 {customer.credit.allowed && (
                   <div className="">
                     <span className="bg-gray-400 p-1 rounded">Credit:</span>
-                    {` ${customer.credit.max}-${customer.credit.used}`}
+                    {` ${
+                      customer.credit.max == 0
+                        ? "No Limit"
+                        : customer.credit.max.toLocaleString("en-US")
+                    } - ${customer.credit.used.toLocaleString("en-US")} ETB`}
                   </div>
                 )}
               </CardContent>
@@ -495,7 +498,9 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
                             +
                           </div>
                         </div>
-                        <div className="">{item.product.unit_price}</div>
+                        <div className="">
+                          {item.product.unit_price.toLocaleString("en-US")} ETB
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -506,7 +511,9 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
         ) : (
           <div className="text-gray-400">No products have been selected</div>
         )}
-        {SubTotal != 0 && <div>SubTotal:{SubTotal}</div>}
+        {SubTotal != 0 && (
+          <div>SubTotal: {SubTotal.toLocaleString("en-US")} ETB</div>
+        )}
       </div>
 
       <div className="flex items-center gap-4 mb-2">
@@ -561,17 +568,20 @@ export default function EditSalesForm({ customers, product, sale }: Props) {
         />
       )}
 
-      {Total != 0 && <div>Total:{Total}</div>}
-      {Incash > 0 ? (
-        <div className="">
-          <div className="">InCredit:{creditAmount}</div>
-          <div className="">InCash:{Incash}</div>
-        </div>
-      ) : (
-        <div className="text-red-400">
-          Can not Credit Above the current Total Price
-        </div>
-      )}
+      {Total != 0 && <div>Total: {Total.toLocaleString("en-US")} ETB</div>}
+      {customer &&
+        (Incash > 0 ? (
+          <div className="">
+            <div className="">
+              InCredit: {creditAmount.toLocaleString("en-US")} ETB
+            </div>
+            <div className="">InCash: {Incash.toLocaleString("en-US")} ETB</div>
+          </div>
+        ) : (
+          <div className="text-red-400">
+            Can not Credit Above the current Total Price
+          </div>
+        ))}
 
       <div className="flex justify-end">
         <Button disabled={sending} onClick={onSubmit}>

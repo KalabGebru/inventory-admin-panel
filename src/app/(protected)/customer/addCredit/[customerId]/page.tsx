@@ -34,7 +34,7 @@ export default function AddCredit({ params }: Props) {
 
   return (
     <div className="flex items-center justify-center h-full w-full py-24">
-      <AddCreditForm customer={customerData} />
+      <AddCreditForm customerData={customerData} />
     </div>
   );
 }

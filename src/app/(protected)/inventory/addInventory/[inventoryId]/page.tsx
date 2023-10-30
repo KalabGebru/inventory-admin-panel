@@ -48,7 +48,7 @@ export default function AddInventoryID({ params }: Props) {
       <AddInventoryForm
         product={productData}
         inventoryId={params.inventoryId}
-        inventory={inventoryData}
+        inventoryData={inventoryData}
       />
     </div>
   );

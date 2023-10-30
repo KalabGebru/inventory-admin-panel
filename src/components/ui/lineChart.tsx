@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "./select";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "./loadingSpinner";
 
 const data = [
   {
@@ -66,17 +67,24 @@ const data = [
 
 export default function RenderLineChart() {
   const [data, setData] = useState<any | null>();
+  const [loading, setLoading] = useState<boolean | undefined>(true);
 
   useEffect(() => {
+    setLoading(true);
     const res = fetch(`/api/allTotalSales`)
       .then((response) => response.json())
       .then((data: any) => {
         console.log(data);
         setData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(undefined);
+        console.log(err);
       });
   }, []);
 
-  if (!data) return null;
+  // if (!data) return null;
 
   const week = data?.result?.thisWeek;
   const month = data?.result?.thisMonth;
@@ -115,153 +123,161 @@ export default function RenderLineChart() {
             <TabsTrigger value="Year">Year</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="Week">
-          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
-            This Week Sales
-          </h1>
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                width={500}
-                height={300}
-                data={week}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  height={50}
-                  label={{
-                    value: "Date",
-                    angle: 0,
-                    position: "insideBottom",
-                  }}
-                />
-                <YAxis
-                  width={120}
-                  tickFormatter={tickFormatter2}
-                  label={{
-                    value: "Price of Products",
-                    angle: -90,
-                    position: "left",
-                  }}
-                />
-                <Tooltip />
-                {/* <Legend /> */}
-                {/* <Line
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <>
+            <TabsContent value="Week">
+              <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+                This Week Sales
+              </h1>
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    width={500}
+                    height={300}
+                    data={week}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="name"
+                      height={50}
+                      label={{
+                        value: "Date",
+                        angle: 0,
+                        position: "insideBottom",
+                      }}
+                    />
+                    <YAxis
+                      width={120}
+                      tickFormatter={tickFormatter2}
+                      label={{
+                        value: "Price of Products",
+                        angle: -90,
+                        position: "left",
+                      }}
+                    />
+                    <Tooltip />
+                    {/* <Legend /> */}
+                    {/* <Line
             type="monotone"
             dataKey="pv"
             stroke="#8884d8"
             activeDot={{ r: 8 }}
           /> */}
-                <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
-        <TabsContent value="Month">
-          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
-            This Month Sales
-          </h1>
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                width={500}
-                height={300}
-                data={month}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  height={50}
-                  label={{
-                    value: `Current Month`,
-                    angle: 0,
-                    position: "insideBottom",
-                  }}
-                />
-                <YAxis
-                  width={120}
-                  tickFormatter={tickFormatter2}
-                  label={{
-                    value: "Price of Products",
-                    angle: -90,
-                    position: "left",
-                  }}
-                />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="sum"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                />
-                {/* <Line type="monotone" dataKey="sum" stroke="#82ca9d" /> */}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
-        <TabsContent value="Year">
-          <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
-            This Year Sales
-          </h1>
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                width={500}
-                height={300}
-                data={year}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  height={50}
-                  label={{
-                    value: `Months`,
-                    angle: 0,
-                    position: "insideBottom",
-                  }}
-                />
-                <YAxis
-                  width={120}
-                  tickFormatter={tickFormatter2}
-                  label={{
-                    value: "Price of Products",
-                    angle: -90,
-                    position: "left",
-                  }}
-                />
-                <Tooltip />
-                <Legend />
-                {/* <Line
+                    <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="Month">
+              <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+                This Month Sales
+              </h1>
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    width={500}
+                    height={300}
+                    data={month}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="name"
+                      height={50}
+                      label={{
+                        value: `Current Month`,
+                        angle: 0,
+                        position: "insideBottom",
+                      }}
+                    />
+                    <YAxis
+                      width={120}
+                      tickFormatter={tickFormatter2}
+                      label={{
+                        value: "Price of Products",
+                        angle: -90,
+                        position: "left",
+                      }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="sum"
+                      stroke="#8884d8"
+                      activeDot={{ r: 8 }}
+                    />
+                    {/* <Line type="monotone" dataKey="sum" stroke="#82ca9d" /> */}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="Year">
+              <h1 className={`text-xl rounded-md py-1 px-2 mb-4`}>
+                This Year Sales
+              </h1>
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    width={500}
+                    height={300}
+                    data={year}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="name"
+                      height={50}
+                      label={{
+                        value: `Months`,
+                        angle: 0,
+                        position: "insideBottom",
+                      }}
+                    />
+                    <YAxis
+                      width={120}
+                      tickFormatter={tickFormatter2}
+                      label={{
+                        value: "Price of Products",
+                        angle: -90,
+                        position: "left",
+                      }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    {/* <Line
             type="monotone"
             dataKey="pv"
             stroke="#8884d8"
             activeDot={{ r: 8 }}
           /> */}
-                <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
+                    <Line type="monotone" dataKey="sum" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );

@@ -45,7 +45,7 @@ type Inventory = {
 type Props = {
   product: Product;
   inventoryId: string;
-  inventory?: Inventory;
+  inventoryData: Inventory;
 };
 
 const FormSchema = z.object({
@@ -55,9 +55,9 @@ const FormSchema = z.object({
 export default function AddInventoryForm({
   product,
   inventoryId,
-  inventory,
+  inventoryData,
 }: Props) {
-  const { setInventory, setInventoryLoading } = useTodo();
+  const { inventory, setInventory, setInventoryLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const router = useRouter();
 
@@ -65,19 +65,36 @@ export default function AddInventoryForm({
     resolver: zodResolver(FormSchema),
   });
 
-  function fetchInventorydata() {
-    setInventoryLoading(true);
-    fetch("/api/getInventory")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setInventory(data.Inventory);
-        setInventoryLoading(false);
-      })
-      .catch((err) => {
-        setInventoryLoading(undefined);
-        console.log(err);
-      });
+  function fetchInventorydata(postdata: any) {
+    // setInventoryLoading(true);
+    // fetch("/api/getInventory")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setInventory(data.Inventory);
+    //     setInventoryLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setInventoryLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newInventory = inventory.map((Inv: Inventory) => {
+      if (Inv.docId == postdata.inventoryId) {
+        return {
+          ...Inv,
+          history: [
+            ...Inv.history,
+            {
+              addedAmount: postdata.addedAmount,
+              datetime: new Date().toISOString(),
+            },
+          ],
+          currentAmount: Inv.currentAmount + Number(postdata.addedAmount),
+        };
+      }
+      return Inv;
+    });
+    setInventory(newInventory);
   }
 
   async function AddToInventory(data: z.infer<typeof FormSchema>) {
@@ -94,7 +111,7 @@ export default function AddInventoryForm({
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchInventorydata();
+      fetchInventorydata(postdata);
       router.push(`/inventory/`);
       return response.result;
     }
@@ -145,16 +162,18 @@ export default function AddInventoryForm({
             </div>
             <div className="flex gap-2">
               <span className="bg-gray-400 rounded px-1">price : </span>
-              <div className="">{product.unit_price}</div>
+              <div className="">
+                {product.unit_price.toLocaleString("en-US")} ETB
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      {inventory && (
+      {inventoryData && (
         <div className="mb-4">
           <div className="mb-2">Inventory History:</div>
           <div className="flex flex-col gap-2">
-            {inventory?.history.map((h, i) => {
+            {inventoryData?.history.map((h, i) => {
               return (
                 <Card key={i} className="mb-4">
                   <CardContent className="flex p-4 gap-4">

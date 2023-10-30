@@ -107,7 +107,7 @@ export default function AddSalesForm() {
     }
     setIncash(Number(CIncash.toFixed(2)));
     console.log("h");
-  }, [selectedCustomer, items, creditAmount, paidIn]);
+  }, [selectedCustomer, items, discounted, creditAmount, paidIn]);
 
   function fetchSalesdata(id: string, senddata: any) {
     // setSalesLoading(true);
@@ -266,14 +266,15 @@ export default function AddSalesForm() {
   }
 
   function subtruct(id: string) {
-    setItems((pre) => {
-      return pre.map((item) => {
-        if (item.productId == id && item.no > 1) {
-          return { ...item, no: item.no - 1 };
-        }
-        return item;
-      });
+    const newItems = items.map((item) => {
+      if (item.productId == id) {
+        return { ...item, no: item.no - 1 };
+      }
+      return item;
     });
+    const deletezero = newItems.filter((item) => item.no != 0);
+
+    setItems(deletezero);
   }
 
   function add(id: string) {
@@ -327,8 +328,10 @@ export default function AddSalesForm() {
                     {` ${
                       selectedCustomer.credit.max == 0
                         ? "No Limit"
-                        : selectedCustomer.credit.max
-                    }-${selectedCustomer.credit.used}`}
+                        : selectedCustomer.credit.max.toLocaleString("en-US")
+                    } - ${selectedCustomer.credit.used.toLocaleString(
+                      "en-US"
+                    )} ETB`}
                   </div>
                 )}
               </CardContent>
@@ -379,7 +382,9 @@ export default function AddSalesForm() {
                             +
                           </div>
                         </div>
-                        <div className="">{item.product.unit_price}</div>
+                        <div className="">
+                          {item.product.unit_price.toLocaleString("en-US")} ETB
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -390,7 +395,9 @@ export default function AddSalesForm() {
         ) : (
           <div className="text-gray-400">No products have been selected</div>
         )}
-        {SubTotal != 0 && <div>SubTotal:{SubTotal}</div>}
+        {SubTotal != 0 && (
+          <div>SubTotal: {SubTotal.toLocaleString("en-US")} ETB</div>
+        )}
       </div>
 
       <div className="flex items-center gap-4 mb-2">
@@ -447,11 +454,13 @@ export default function AddSalesForm() {
         />
       )}
 
-      {Total != 0 && <div>Total:{Total}</div>}
+      {Total != 0 && <div>Total: {Total.toLocaleString("en-US")} ETB</div>}
       {Incash > 0 && (
         <div className="">
-          <div className="">InCredit:{creditAmount}</div>
-          <div className="">InCash:{Incash}</div>
+          <div className="">
+            InCredit: {creditAmount.toLocaleString("en-US")} ETB
+          </div>
+          <div className="">InCash: {Incash.toLocaleString("en-US")} ETB</div>
         </div>
       )}
       {paidIn == "credit" && creditAmount > Total && (

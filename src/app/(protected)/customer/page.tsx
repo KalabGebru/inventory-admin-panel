@@ -131,7 +131,7 @@ export default function Customer() {
       header: "Phone Number",
       accessorKey: "phone_number",
       cell: ({ row }) => {
-        const formatedPhoneNumber = `+25${row.getValue("phone_number")}`;
+        const formatedPhoneNumber = `+251${row.getValue("phone_number")}`;
         return <div className="font-medium">{formatedPhoneNumber}</div>;
       },
     },
@@ -190,7 +190,9 @@ export default function Customer() {
         const credit: credit = row.getValue("credit");
         return (
           <div className="font-medium">
-            {credit.allowed ? credit.used : null}
+            {credit.allowed
+              ? `${credit.used.toLocaleString("en-US")} ETB`
+              : null}
           </div>
         );
       },

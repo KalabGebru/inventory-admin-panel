@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./select";
+import LoadingSpinner from "./loadingSpinner";
 
 // const data = [
 //   {
@@ -97,6 +98,7 @@ function getFirstDayOfTheYear(d: Date) {
 export default function BarChartData({ Labal }: Props) {
   const [data, setData] = useState<any | null>();
   const [filterDate, setFilterDate] = useState("thisMonth");
+  const [loading, setLoading] = useState<boolean | undefined>(true);
 
   const path =
     Labal == "Top Catagory"
@@ -123,6 +125,7 @@ export default function BarChartData({ Labal }: Props) {
         : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: 5 };
     console.log(path);
 
+    setLoading(true);
     const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
@@ -131,13 +134,18 @@ export default function BarChartData({ Labal }: Props) {
       .then((data: any) => {
         console.log(data);
         setData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(undefined);
+        console.log(err);
       });
   }, [filterDate]);
 
-  if (!data) return null;
+  // if (!data) return null;
 
-  const dd = data.result.topByNo;
-  const ddd = data.result.topByPrice;
+  const dd = data?.result?.topByNo;
+  const ddd = data?.result?.topByPrice;
   const keyY =
     Labal == "Top Catagory"
       ? "catagory"
@@ -174,86 +182,99 @@ export default function BarChartData({ Labal }: Props) {
             <TabsTrigger value="byPrice">By Price</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="byNo">
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart
-                className=""
-                layout="vertical"
-                width={500}
-                height={400}
-                data={dd}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  bottom: 20,
-                  left: 20,
-                }}
-              >
-                <CartesianGrid stroke="#f5f5f5" />
-                <XAxis
-                  height={50}
-                  type="number"
-                  label={{
-                    value: "No of Products",
-                    angle: 0,
-                    position: "insideBottom",
-                  }}
-                />
-                <YAxis
-                  width={70}
-                  tickFormatter={tickFormatter}
-                  dataKey={keyY}
-                  type="category"
-                  scale="band"
-                />
-                <Tooltip />
-                {/* <Legend /> */}
-                <Bar dataKey="no" barSize={20} fill="#413ea0" />
-              </ComposedChart>
-            </ResponsiveContainer>
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <LoadingSpinner />
           </div>
-        </TabsContent>
-        <TabsContent value="byPrice">
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart
-                className=""
-                layout="vertical"
-                width={500}
-                height={400}
-                data={ddd}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  bottom: 20,
-                  left: 20,
-                }}
-              >
-                <CartesianGrid stroke="#f5f5f5" />
-                <XAxis
-                  height={50}
-                  type="number"
-                  label={{
-                    value: "Price of Products",
-                    angle: 0,
-                    position: "insideBottom",
-                  }}
-                />
-                <YAxis
-                  width={70}
-                  tickFormatter={tickFormatter}
-                  dataKey={keyY}
-                  type="category"
-                  scale="band"
-                />
-                <Tooltip />
-                {/* <Legend /> */}
-                <Bar dataKey="price" barSize={20} fill="#413ea0" />
-              </ComposedChart>
-            </ResponsiveContainer>
+        ) : data?.result?.topByPrice?.length == 0 ||
+          data?.result?.topByNo?.length == 0 ? (
+          <div className="flex items-center justify-center p-12">
+            <span>no sales found</span>
           </div>
-        </TabsContent>
+        ) : (
+          <>
+            <TabsContent value="byNo">
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    className=""
+                    layout="vertical"
+                    width={500}
+                    height={400}
+                    data={dd}
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      bottom: 20,
+                      left: 20,
+                    }}
+                  >
+                    <CartesianGrid stroke="#f5f5f5" />
+                    <XAxis
+                      height={50}
+                      type="number"
+                      label={{
+                        value: "No of Products",
+                        angle: 0,
+                        position: "insideBottom",
+                      }}
+                    />
+                    <YAxis
+                      width={70}
+                      tickFormatter={tickFormatter}
+                      dataKey={keyY}
+                      type="category"
+                      scale="band"
+                    />
+                    <Tooltip />
+                    {/* <Legend /> */}
+                    <Bar dataKey="no" barSize={20} fill="#413ea0" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="byPrice">
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    className=""
+                    layout="vertical"
+                    width={500}
+                    height={400}
+                    data={ddd}
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      bottom: 20,
+                      left: 20,
+                    }}
+                  >
+                    <CartesianGrid stroke="#f5f5f5" />
+                    <XAxis
+                      height={50}
+                      type="number"
+                      label={{
+                        value: "Price of Products",
+                        angle: 0,
+                        position: "insideBottom",
+                      }}
+                    />
+                    <YAxis
+                      width={70}
+                      tickFormatter={tickFormatter}
+                      dataKey={keyY}
+                      type="category"
+                      scale="band"
+                    />
+                    <Tooltip />
+                    {/* <Legend /> */}
+                    <Bar dataKey="price" barSize={20} fill="#413ea0" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );

@@ -13,6 +13,20 @@ const nextConfig = {
       },
     ],
   },
+  // exportPathMap: function () {
+  //   return {
+  //     "/": { page: "/" },
+  //     "/product": { page: "/product" },
+  //     "/customer": { page: "/customer" },
+  //     "/inventory": { page: "/inventory" },
+  //     "/sales": { page: "/sales" },
+  //     "/users": { page: "/users" },
+  //     // Add other routes here
+  //   };
+  // },
+
+  // target: "server",
+  // ssr: true,
 };
 
 module.exports = nextConfig;

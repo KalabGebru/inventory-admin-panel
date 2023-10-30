@@ -35,14 +35,14 @@ type Customer = {
 };
 
 type Props = {
-  customer: Customer;
+  customerData: Customer;
 };
 
 const FormSchema = z.object({
   paidAmount: z.string(),
 });
-export default function AddCreditForm({ customer }: Props) {
-  const { setCustomer, setCustomerLoading } = useTodo();
+export default function AddCreditForm({ customerData }: Props) {
+  const { customer, setCustomer, setCustomerLoading } = useTodo();
   const [sending, setSending] = useState(false);
   const router = useRouter();
 
@@ -50,29 +50,42 @@ export default function AddCreditForm({ customer }: Props) {
     resolver: zodResolver(FormSchema),
   });
 
-  function fetchCustomerdata() {
-    setCustomerLoading(true);
-    fetch("/api/getCustomers", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setCustomer(data.Customers);
-        setCustomerLoading(false);
-      })
-      .catch((err) => {
-        setCustomerLoading(undefined);
-        console.log(err);
-      });
+  function fetchCustomerdata(postdata: any) {
+    // setCustomerLoading(true);
+    // fetch("/api/getCustomers")
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     setCustomer(data.Customers);
+    //     setCustomerLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setCustomerLoading(undefined);
+    //     console.log(err);
+    //   });
+    const newCustomer = customer.map((Cu: Customer) => {
+      if (Cu.docId == postdata.customerId) {
+        const editedCustomer = {
+          ...Cu,
+          credit: postdata.newCredit,
+        };
+
+        return editedCustomer;
+      }
+      return Cu;
+    });
+
+    setCustomer(newCustomer);
   }
 
   async function AddCreditToCustomer(data: z.infer<typeof FormSchema>) {
     const postdata = {
       newCredit: {
         allowed: true,
-        max: customer.credit.max,
-        used: customer.credit.used - Number(data.paidAmount),
+        max: customerData.credit.max,
+        used: customerData.credit.used - Number(data.paidAmount),
       },
-      customerId: customer.docId,
+      customerId: customerData.docId,
     };
     console.log(postdata);
     const res = await fetch("/api/addCredit", {
@@ -83,7 +96,7 @@ export default function AddCreditForm({ customer }: Props) {
     if (res.ok) {
       const response = await res.json();
       console.log(response.result);
-      fetchCustomerdata();
+      fetchCustomerdata(postdata);
       router.push(`/customer/`);
       return response.result;
     }
@@ -97,7 +110,7 @@ export default function AddCreditForm({ customer }: Props) {
       loading: "sending data ...",
       success: (res) => {
         setSending(false);
-        return `$${data.paidAmount} credit has been added to "${customer.first_name}"`;
+        return `$${data.paidAmount} credit has been added to "${customerData.first_name}"`;
       },
       error: (err) => {
         setSending(false);
@@ -115,26 +128,28 @@ export default function AddCreditForm({ customer }: Props) {
           <CardContent className="flex flex-col gap-2 p-4">
             <div className="">
               <span className="bg-gray-400 p-1 rounded">FirstName:</span>
-              {` ${customer.first_name}`}
+              {` ${customerData.first_name}`}
             </div>
             <div className="">
               <span className="bg-gray-400 p-1 rounded">LastName:</span>
-              {` ${customer.last_name}`}
+              {` ${customerData.last_name}`}
             </div>
             <div className="">
               <span className="bg-gray-400 p-1 rounded">PhoneNumber:</span>
-              {` ${customer.phone_number}`}
+              {` ${customerData.phone_number}`}
             </div>
             <div className="">
               <span className="bg-gray-400 p-1 rounded">Email:</span>
-              {` ${customer.email}`}
+              {` ${customerData.email}`}
             </div>
 
             <div className="">
               <span className="bg-gray-400 p-1 rounded">Credit:</span>
               {` ${
-                customer.credit.max == 0 ? "No Limit" : customer.credit.max
-              }-${customer.credit.used}`}
+                customerData.credit.max == 0
+                  ? "No Limit"
+                  : customerData.credit.max
+              }-${customerData.credit.used}`}
             </div>
           </CardContent>
         </Card>
@@ -153,13 +168,17 @@ export default function AddCreditForm({ customer }: Props) {
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder={customer.credit.used.toString()}
-                    max={customer.credit.used.toString()}
+                    placeholder={`${customerData.credit.used.toLocaleString(
+                      "en-US"
+                    )} ETB`}
+                    max={customerData.credit.used.toString()}
                     {...field}
                   />
                 </FormControl>
                 <FormDescription>
-                  {`The customer's unpaid credit is ${customer.credit.used}`}
+                  {`The customer's unpaid credit is ${customerData.credit.used.toLocaleString(
+                    "en-US"
+                  )} ETB`}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

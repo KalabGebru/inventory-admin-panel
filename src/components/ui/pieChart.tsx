@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "./select";
 import { useTodo } from "@/hooks/useContextData";
+import LoadingSpinner from "./loadingSpinner";
 
 // const data = [
 //   {
@@ -104,6 +105,7 @@ export default function PieChartData({ Labal }: Props) {
   const [data, setData] = useState<any | null>();
   const { catagory } = useTodo();
   const [filterDate, setFilterDate] = useState("thisWeek");
+  const [loading, setLoading] = useState<boolean | undefined>(true);
 
   console.log("g");
 
@@ -134,7 +136,7 @@ export default function PieChartData({ Labal }: Props) {
             max: nowPlusone,
             No: catagory.length ? catagory.length : 2,
           };
-
+    setLoading(true);
     const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
@@ -143,15 +145,20 @@ export default function PieChartData({ Labal }: Props) {
       .then((data: any) => {
         console.log(data);
         setData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(undefined);
+        console.log(err);
       });
   }, [filterDate]);
 
-  if (!data) return null;
+  // if (!data) return null;
 
   let dd;
 
   if (Labal == "Catagory") {
-    const catagoryResults = data.result.topByNo.map((cat: any) => {
+    const catagoryResults = data?.result?.topByNo?.map((cat: any) => {
       return {
         ...cat,
         catagoryName: catagory.find((c: any) => c.docId == cat.catagory)
@@ -160,7 +167,7 @@ export default function PieChartData({ Labal }: Props) {
     });
     dd = catagoryResults;
   } else {
-    dd = data.result.Customer;
+    dd = data?.result?.Customer;
   }
 
   // const ddd = data.result.topByPrice;
@@ -193,9 +200,11 @@ export default function PieChartData({ Labal }: Props) {
   };
 
   return (
-    <div className="border rounded-lg p-4">
-      <h1 className={`text-xl rounded-md py-1 px-2 mb-2`}>CustomerVs</h1>
-      <Tabs defaultValue="byNo" className="">
+    <div className="flex flex-col items-center justify-center border rounded-lg p-4">
+      <h1 className={`text-xl rounded-md py-1 px-2 mb-2 w-full`}>
+        {Labal == "Catagory" ? "CatagoryVs" : "CustomerVs"}
+      </h1>
+      <Tabs defaultValue="byNo" className="w-full h-full">
         <div className="flex items-center justify-between gap-8 mb-8">
           <Select
             onValueChange={(value) => setFilterDate(value)}
@@ -215,72 +224,85 @@ export default function PieChartData({ Labal }: Props) {
             <TabsTrigger value="byPrice">By Price</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="byNo">
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart width={730} height={250}>
-                <Legend
-                  layout="horizontal"
-                  verticalAlign="top"
-                  align="center"
-                />
-                <Pie
-                  data={dd}
-                  dataKey="no"
-                  nameKey={
-                    Labal == "Catagory" ? "catagoryName" : "customerType"
-                  }
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                >
-                  {dd.map((entry: any, index: number) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    ></Cell>
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <LoadingSpinner />
           </div>
-        </TabsContent>
-        <TabsContent value="byPrice">
-          <div className="w-full aspect-video">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart width={730} height={50}>
-                <Legend
-                  layout="horizontal"
-                  verticalAlign="top"
-                  align="center"
-                />
-                <Pie
-                  data={dd}
-                  dataKey="price"
-                  nameKey={
-                    Labal == "Catagory" ? "catagoryName" : "customerType"
-                  }
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                >
-                  {dd.map((entry: any, index: number) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
+        ) : data?.result?.Customer?.length == 0 ||
+          data?.result?.topByNo?.length == 0 ? (
+          <div className="flex items-center justify-center p-12">
+            <span>no sales found</span>
+          </div>
+        ) : (
+          <>
+            <TabsContent value="byNo">
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart width={730} height={250}>
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="top"
+                      align="center"
                     />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
+                    <Pie
+                      data={dd}
+                      dataKey="no"
+                      nameKey={
+                        Labal == "Catagory" ? "catagoryName" : "customerType"
+                      }
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      fill="#8884d8"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                    >
+                      {dd.map((entry: any, index: number) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        ></Cell>
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>
+            <TabsContent value="byPrice">
+              <div className="w-full aspect-video">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart width={730} height={50}>
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="top"
+                      align="center"
+                    />
+                    <Pie
+                      data={dd}
+                      dataKey="price"
+                      nameKey={
+                        Labal == "Catagory" ? "catagoryName" : "customerType"
+                      }
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      fill="#8884d8"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                    >
+                      {dd.map((entry: any, index: number) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </TabsContent>{" "}
+          </>
+        )}
       </Tabs>
     </div>
   );
