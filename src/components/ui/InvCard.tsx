@@ -66,7 +66,7 @@ export default function InvCard({ no, Labal }: Props) {
                 {Labal == "Catagory"
                   ? catagory.find(
                       (c: any) => c.docId === data.result[type][0].catagory
-                    ).catagoryName
+                    )?.catagoryName
                   : data.result[type][0].product_name}
               </span>
             </div>
@@ -103,7 +103,7 @@ export default function InvCard({ no, Labal }: Props) {
                 {Labal == "Catagory"
                   ? catagory.find(
                       (c: any) => c.docId === data.result[type][0].catagory
-                    ).catagoryName
+                    )?.catagoryName
                   : data.result[type][0].product_name}
               </span>
             </div>
