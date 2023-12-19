@@ -41,18 +41,18 @@ export default function TopCard({ no, path, timeLabel }: Props) {
   now.setDate(now.getDate() + 1);
   const nowPlusone = now.toISOString().slice(0, 10);
   console.log(nowPlusone, now);
-  const Data =
-    timeLabel == "This Week"
-      ? {
-          min: getMonday(new Date()),
-          max: nowPlusone,
-          No: no,
-        }
-      : timeLabel == "This Month"
-      ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: no }
-      : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: no };
 
   useEffect(() => {
+    const Data =
+      timeLabel == "This Week"
+        ? {
+            min: getMonday(new Date()),
+            max: nowPlusone,
+            No: no,
+          }
+        : timeLabel == "This Month"
+        ? { min: getFirstDayOfTheMonth(new Date()), max: nowPlusone, No: no }
+        : { min: getFirstDayOfTheYear(new Date()), max: nowPlusone, No: no };
     const res = fetch(`/api/${path}`, {
       method: "POST",
       body: JSON.stringify(Data),
@@ -62,7 +62,7 @@ export default function TopCard({ no, path, timeLabel }: Props) {
         console.log(data);
         setData(data);
       });
-  }, [sales, path, Data]);
+  }, [path, timeLabel]);
 
   if (
     !data ||
